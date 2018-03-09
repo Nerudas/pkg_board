@@ -11,3 +11,5 @@ Thank you for your understanding.
 
 
 ## Package Contents
+* **Bulletin Board Component**  
+Component for creating Bulletin boards on the site

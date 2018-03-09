@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields name="filter">
+		<field name="search" type="text"
+			   label="JSEARCH_FILTER"
+			   hint="JSEARCH_FILTER"/>
+		<field name="category" type="boardcategory"
+			   label="COM_BOARD_CATEGORY"
+			   links="true"/>
+		<field name="for_when" type="checkboxes"
+			   label="COM_BOARD_ITEM_FOR_WHEN">
+			<option value="today">COM_BOARD_ITEM_FOR_WHEN_TODAY</option>
+			<option value="tomorrow">COM_BOARD_ITEM_FOR_WHEN_TOMORROW</option>
+		</field>
+		<field name="price" type="price"
+			   label="JGLOBAL_FIELD_PRICE_LABEL"
+			   description="JGLOBAL_FIELD_PRICE_DESC"
+			   contract_price="true"
+			   between="true"/>
+
+		<field name="payment_method" type="checkboxes"
+			   label="COM_BOARD_ITEM_PAYMENT_METHOD">
+			<option value="cashless">COM_BOARD_ITEM_PAYMENT_METHOD_CASHLESS</option>
+			<option value="cash">COM_BOARD_ITEM_PAYMENT_METHOD_CASH</option>
+		</field>
+
+		<field name="prepayment" type="checkboxes"
+			   label="COM_BOARD_ITEM_PREPAYMENT">
+			<option value="required">COM_BOARD_ITEM_PREPAYMENT_REQUIRED</option>
+			<option value="no">COM_BOARD_ITEM_PREPAYMENT_NO</option>
+		</field>
+
+		<!--<field name="allregions" type="checkbox" label="COM_BOARD_ALLREGIONS" value="1"/>-->
+		<field name="onlymy" type="checkbox" label="COM_BOARD_ONLYMY" value="1"/>
+	</fields>
+</form>

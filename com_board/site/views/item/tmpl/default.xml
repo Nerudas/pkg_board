@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="COM_BOARD_VIEW_ITEM" option="COM_BOARD_VIEW_ITEM_DEFAULT_OPTION">
+		<message>
+			<![CDATA[COM_BOARD_VIEW_ITEM_DESCRIPTION]]>
+		</message>
+	</layout>
+
+	<fields name="request" addfieldpath="/administrator/components/com_board/models/fields">
+		<fieldset name="request">
+			<field name="id" type="sql"
+				   label="COM_BOARD_ITEM"
+				   query="SELECT id, title FROM #__board_items"
+				   key_field="id"
+				   value_field="title"
+				   required="true">
+				<option value="">JNONE</option>
+			</field>
+		</fieldset>
+	</fields>
+
+	<fields name="params">
+	</fields>
+</metadata>

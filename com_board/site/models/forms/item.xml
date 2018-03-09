@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<form>
+	<fieldset>
+		<field name="title" type="text"
+			   label="JGLOBAL_TITLE"
+			   description="JFIELD_TITLE_DESC"
+			   class="input-xxlarge input-large-text"
+			   size="40"
+			   required="true"/>
+		<field name="text" type="editor"
+			   label="COM_BOARD_ITEM_TEXT"
+			   hint="COM_BOARD_ITEM_TEXT"
+			   filter="JComponentHelper::filterText"
+			   buttons="true"
+			   required="true"/>
+		<field name="tags" type="advtags"
+			   label="JTAG"
+			   description="JTAG_DESC"
+			   multiple="true"/>
+		<field name="images" type="ajaximage"
+			   multiple="true"
+			   unique="true"
+			   limit="5"
+			   label="COM_BOARD_ITEM_IMAGES"/>
+		<field name="map" type="map"
+			   label="JGLOBAL_FIELD_MAP_LABEL"
+			   description="JGLOBAL_FIELD_MAP_DESC"/>
+		<field name="for_when" type="radio"
+			   label="COM_BOARD_ITEM_FOR_WHEN"
+			   class="btn-group"
+			   default="">
+			<option value="">COM_BOARD_ITEM_FOR_WHEN_NONE</option>
+			<option value="today">COM_BOARD_ITEM_FOR_WHEN_TODAY</option>
+			<option value="tomorrow">COM_BOARD_ITEM_FOR_WHEN_TOMORROW</option>
+		</field>
+		<!-- Remove actual function -->
+		<!--<field name="actual" type="radio"-->
+		<!--label="COM_BOARD_ITEM_ACTUAL"-->
+		<!--class="btn-group"-->
+		<!--default="1 week">-->
+		<!--<option value="1 day">COM_BOARD_ITEM_ACTUAL_DAY</option>-->
+		<!--<option value="3 day">COM_BOARD_ITEM_ACTUAL_THREEDAY</option>-->
+		<!--<option value="1 week">COM_BOARD_ITEM_ACTUAL_WEEK</option>-->
+		<!--<option value="1 month">COM_BOARD_ITEM_ACTUAL_MONTH</option>-->
+		<!--</field>-->
+	</fieldset>
+
+	<fieldset name="contacts" label="COM_BOARD_ITEM_CONTACTS">
+		<fields name="contacts">
+			<field name="phones" type="phones"
+				   label="JGLOBAL_FIELD_PHONES_LABEL"
+				   description="JGLOBAL_FIELD_PHONES_DESC"
+				   limit="3"/>
+			<field name="email" type="email"
+				   label="JGLOBAL_EMAIL"
+				   size="30"
+				   validate="email"/>
+			<field name="site" type="text" label="COM_BOARD_ITEM_SITE"/>
+			<field name="vk" type="social"
+				   label="JGLOBAL_FIELD_SOCIAL_LABEL_VK"
+				   description="JGLOBAL_FIELD_SOCIAL_DESC"
+				   network="vk.com"/>
+			<field name="facebook" type="social"
+				   label="JGLOBAL_FIELD_SOCIAL_LABEL_FB"
+				   description="JGLOBAL_FIELD_SOCIAL_DESC"
+				   network="facebook.com"/>
+			<field name="instagram" type="social"
+				   label="JGLOBAL_FIELD_SOCIAL_LABEL_INST"
+				   description="JGLOBAL_FIELD_SOCIAL_DESC"
+				   network="instagram.com"/>
+			<field name="odnoklassniki" type="social"
+				   label="JGLOBAL_FIELD_SOCIAL_LABEL_OK"
+				   description="JGLOBAL_FIELD_SOCIAL_DESC"
+				   network="ok.ru"/>
+		</fields>
+	</fieldset>
+
+	<fieldset name="payment" label="COM_BOARD_ITEM_PAYMENT">
+		<field name="price" type="price"
+			   label="JGLOBAL_FIELD_PRICE_LABEL"
+			   description="JGLOBAL_FIELD_PRICE_DESC"
+			   contract_price="true"/>
+		<field name="payment_method" type="radio"
+			   label="COM_BOARD_ITEM_PAYMENT_METHOD"
+			   class="btn-group"
+			   default="all">
+			<option value="all">COM_BOARD_ITEM_PAYMENT_METHOD_ALL</option>
+			<option value="cashless">COM_BOARD_ITEM_PAYMENT_METHOD_CASHLESS</option>
+			<option value="cash">COM_BOARD_ITEM_PAYMENT_METHOD_CASH</option>
+		</field>
+		<field name="prepayment" type="radio"
+			   label="COM_BOARD_ITEM_PREPAYMENT"
+			   class="btn-group"
+			   default="all">
+			<option value="all">COM_BOARD_ITEM_PREPAYMENT_ALL</option>
+			<option value="required">COM_BOARD_ITEM_PREPAYMENT_REQUIRED</option>
+			<option value="no">COM_BOARD_ITEM_PREPAYMENT_NO</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="hidden">
+		<field name="imagefolder" type="imagefolder" path="images/board/items"/>
+		<field name="region" type="hidden"/>
+		<field name="state" type="hidden" default="1"/>
+		<field name="access" type="hidden" readonly="true"/>
+		<fields name="attribs">
+			<field name="item_layout" type="hidden" readonly="true" useglobal="true"/>
+		</fields>
+		<field name="created_by" type="hidden" readonly="true"/>
+		<field name="hits" type="hidden" readonly="true"/>
+		<field name="id" type="hidden" default="0" readonly="true"/>
+		<field name="category" type="hidden" default="0"/>
+		<field name="metakey" type="hidden" readonly="true"/>
+		<field name="metadesc" type="hidden" readonly="true"/>
+		<fields name="metadata">
+			<field name="robots" type="hidden" readonly="true"/>
+			<field name="author" type="hidden" readonly="true"/>
+			<field name="rights" type="hidden" readonly="true"/>
+			<field name="xreference" type="hidden" readonly="true"/>
+		</fields>
+	</fieldset>
+</form>
