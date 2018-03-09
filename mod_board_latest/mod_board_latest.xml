@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.8" type="module" client="site" method="upgrade">
+	<name>MOD_BOARD_LATEST</name>
+	<author>Nerudas</author>
+	<creationDate>March 2018</creationDate>
+	<copyright>Copyright (c) 2015 - 2018 Nerudas. All rights reserved.</copyright>
+	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
+	<authorEmail>support@nerudas.ru</authorEmail>
+	<authorUrl>nerudas.ru</authorUrl>
+	<version>1.0.0</version>
+	<description>MOD_BOARD_LATEST_DESCRIPTION</description>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.mod_board_latest.ini</language>
+		<language tag="en-GB">en-GB/en-GB.mod_board_latest.sys.ini</language>
+		<language tag="ru-RU">ru-RU/ru-RU.mod_board_latest.ini</language>
+		<language tag="ru-RU">ru-RU/ru-RU.mod_board_latest.sys.ini</language>
+	</languages>
+	<files>
+		<filename module="mod_board_latest">mod_board_latest.php</filename>
+		<folder>tmpl</folder>
+	</files>
+	<config>
+		<fields name="params" addfieldpath="/administrator/components/com_board/models/fields">
+			<fieldset name="basic">
+				<field name="category" type="boardcategory"
+					   label="MOD_BOARD_LATEST_PARAMS_CATEGORY"
+					   default="1"
+					   required="true">
+					<option value="1">JGLOBAL_ROOT</option>
+				</field>
+				<field name="limit" type="number" label="MOD_BOARD_LATEST_PARAMS_LIMIT" default="5"/>
+				<field name="allregions" type="radio"
+					   default="0"
+					   label="MOD_BOARD_LATEST_ALL_REGIONS"
+					   class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="for_when" type="list"
+					   label="MOD_BOARD_LATEST_PARAMS_FOR_WHEN"
+					   default="">
+					<option value="">JNONE</option>
+					<option value="today">MOD_BOARD_LATEST_PARAMS_FOR_WHEN_TODAY</option>
+					<option value="tomorrow">MOD_BOARD_LATEST_PARAMS_FOR_WHEN_TOMORROW</option>
+				</field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="layout" type="modulelayout"
+					   label="JFIELD_ALT_LAYOUT_LABEL"
+					   description="JFIELD_ALT_MODULE_LAYOUT_DESC"/>
+				<field name="moduleclass_sfx" type="textarea"
+					   label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+					   description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"
+					   rows="3"/>
+				<field name="cache" type="list"
+					   label="COM_MODULES_FIELD_CACHING_LABEL"
+					   description="COM_MODULES_FIELD_CACHING_DESC"
+					   default="1">
+					<option value="1">JGLOBAL_USE_GLOBAL</option>
+					<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+				</field>
+				<field name="cache_time" type="text"
+					   label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
+					   description="COM_MODULES_FIELD_CACHE_TIME_DESC"
+					   default="900"/>
+				<field name="cachemode" type="hidden"
+					   default="static">
+					<option value="static">Static</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+	<updateservers>
+		<server type="extension" priority="1" name="Board Latest Module">
+			https://update.nerudas.ru?extension=mod_board_latest
+		</server>
+	</updateservers>
+</extension>

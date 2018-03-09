@@ -16,3 +16,6 @@ Component for creating Bulletin boards on the site
 
 * **Bulletin Board - Categories Module**  
 Module for displaying bulletin board categories
+
+* **Bulletin Board - Latest Module**  
+Module for displaying the latest Bulletin board items
