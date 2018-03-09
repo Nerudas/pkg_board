@@ -56,7 +56,7 @@
 }
 
 [data-afterInit="show"],
-[data-board-itemlist="back"]{
+[data-board-itemlist="back"] {
 	display: none;
 }
 

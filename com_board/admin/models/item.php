@@ -48,7 +48,7 @@ class BoardModelItem extends AdminModel
 	 *
 	 * @see     AdminModel
 	 *
-	 * @since  1.0.0
+	 * @since   1.0.0
 	 */
 	public function __construct($config = array())
 	{

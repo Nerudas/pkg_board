@@ -56,7 +56,7 @@ class JFormFieldBoardCategory extends JFormFieldList
 	 * @return  boolean  True on success.
 	 *
 	 * @see     JFormField::setup()
-	 * @since  1.0.0
+	 * @since   1.0.0
 	 */
 	public function setup(SimpleXMLElement $element, $value, $group = null)
 	{
@@ -64,7 +64,7 @@ class JFormFieldBoardCategory extends JFormFieldList
 		if ($return)
 		{
 			$this->links = (!empty($this->element['links']) && (string) $this->element['links'] == 'true');
-			$this->view = (!empty($this->element['view']) ? (string) $this->element['view'] : 'list');
+			$this->view  = (!empty($this->element['view']) ? (string) $this->element['view'] : 'list');
 		}
 
 		$app       = Factory::getApplication();
@@ -78,8 +78,8 @@ class JFormFieldBoardCategory extends JFormFieldList
 
 		if ($this->links)
 		{
-			$this->name = '';
-			$this->value = Route::_('index.php?option=com_board&view=' . $this->view . '&id=' . $this->value);
+			$this->name     = '';
+			$this->value    = Route::_('index.php?option=com_board&view=' . $this->view . '&id=' . $this->value);
 			$this->onchange = 'if (this.value) window.location.href=this.value';
 		}
 

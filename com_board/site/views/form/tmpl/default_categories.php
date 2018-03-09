@@ -50,7 +50,8 @@ foreach ($this->categories as $category)
 								<div>
 									<label for="category_<?php echo $child->id; ?>">
 										<input id="category_<?php echo $child->id; ?>" type="radio" name="category"
-											   value="<?php echo $child->id; ?>" onchange="this.form.submit();" style="display: none;">
+											   value="<?php echo $child->id; ?>" onchange="this.form.submit();"
+											   style="display: none;">
 										<?php echo $child->title; ?>
 									</label>
 								</div>

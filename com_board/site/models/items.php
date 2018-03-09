@@ -191,8 +191,8 @@ class BoardModelItems extends ListModel
 	 */
 	protected function getListQuery()
 	{
-		$user    = Factory::getUser();
-		$db      = $this->getDbo();
+		$user  = Factory::getUser();
+		$db    = $this->getDbo();
 		$query = $db->getQuery(true)
 			->select(array('i.*', 'r.name AS region_name'))
 			->from($db->quoteName('#__board_items', 'i'));

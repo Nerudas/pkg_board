@@ -173,9 +173,9 @@ class BoardControllerItem extends FormController
 	{
 		parent::cancel($key);
 
-		$app      = Factory::getApplication();
-		$id       = $app->input->getInt('id');
-		$catid    = $app->input->getInt('catid');
+		$app   = Factory::getApplication();
+		$id    = $app->input->getInt('id');
+		$catid = $app->input->getInt('catid');
 
 		$return = (!empty($id)) ? BoardHelperRoute::getItemRoute($id) :
 			BoardHelperRoute::getListRoute($catid);

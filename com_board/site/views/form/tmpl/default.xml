@@ -29,7 +29,7 @@
 			</field>
 		</fields>
 		<fields name="params">
-			<field name="show_categories" type="hidden" default="1" />
+			<field name="show_categories" type="hidden" default="1"/>
 		</fields>
 	</fieldset>
 

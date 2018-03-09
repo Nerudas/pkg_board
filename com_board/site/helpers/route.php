@@ -17,7 +17,7 @@ class BoardHelperRoute extends RouteHelper
 	/**
 	 * Fetches the list route
 	 *
-	 * @param   int    $catid     Category ID
+	 * @param   int $catid Category ID
 	 *
 	 * @return  string
 	 *

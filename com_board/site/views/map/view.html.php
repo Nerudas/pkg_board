@@ -110,8 +110,8 @@ class BoardViewMap extends HtmlView
 	 */
 	public function display($tpl = null)
 	{
-		$app        = Factory::getApplication();
-		$user       = Factory::getUser();
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
 
 		$this->state         = $this->get('State');
 		$this->category      = $this->get('Category');

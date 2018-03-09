@@ -257,9 +257,9 @@ class BoardModelMap extends ListModel
 				$data->root = ($data->id == 1);
 
 				// Links
-				$data->listLink    = Route::_(BoardHelperRoute::getListRoute($data->id));
-				$data->addLink = Route::_(BoardHelperRoute::getFormRoute());
-				$data->mapLink = Route::_(BoardHelperRoute::getMapRoute($data->id));
+				$data->listLink = Route::_(BoardHelperRoute::getListRoute($data->id));
+				$data->addLink  = Route::_(BoardHelperRoute::getFormRoute());
+				$data->mapLink  = Route::_(BoardHelperRoute::getMapRoute($data->id));
 
 				// Convert parameter fields to objects.
 				$registry     = new Registry($data->attribs);
@@ -425,7 +425,7 @@ class BoardModelMap extends ListModel
 					{
 
 						$item->listLink = Route::_(BoardHelperRoute::getListRoute($item->id));
-						$item->mapLink = Route::_(BoardHelperRoute::getMapRoute($item->id));
+						$item->mapLink  = Route::_(BoardHelperRoute::getMapRoute($item->id));
 
 						$this->_parent[$pk] = $item;
 					}

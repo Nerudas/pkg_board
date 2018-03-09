@@ -109,7 +109,8 @@ class BoardViewForm extends HtmlView
 		{
 			$layout .= '_categories';
 		}
-		else {
+		else
+		{
 			// Check actions
 			$authorised = (empty($this->item->id)) ? $user->authorise('core.create', 'com_board') :
 				$user->authorise('core.edit', 'com_board.item.' . $this->item->id) ||

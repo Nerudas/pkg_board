@@ -12,12 +12,14 @@
 	align-items: flex-start;
 	flex-wrap: wrap;
 }
+
 [data-input-boardcategories] .actives {
 	display: inline-flex;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
+
 [data-input-boardcategories] .actives .item {
 	font-size: 14px;
 	white-space: nowrap;
