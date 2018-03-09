@@ -16,6 +16,7 @@
 	</languages>
 	<files>
 		<folder type="component" id="com_board">com_board</folder>
+		<folder type="module" id="mod_board_categories" client="site">mod_board_categories</folder>
 	</files>
 	<updateservers>
 		<server type="extension" priority="1" name="PKG_BOARD">

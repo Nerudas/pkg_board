@@ -13,3 +13,6 @@ Thank you for your understanding.
 ## Package Contents
 * **Bulletin Board Component**  
 Component for creating Bulletin boards on the site
+
+* **Bulletin Board - Categories Module**  
+Module for displaying the latest Bulletin board items
