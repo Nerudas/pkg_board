@@ -15,4 +15,4 @@ Thank you for your understanding.
 Component for creating Bulletin boards on the site
 
 * **Bulletin Board - Categories Module**  
-Module for displaying the latest Bulletin board items
+Module for displaying bulletin board categories
