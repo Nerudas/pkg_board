@@ -303,14 +303,19 @@ class com_BoardInstallerScript
 	 */
 	public function uninstall(JAdapterInstance $adapter)
 	{
-		JFolder::delete(JPATH_ROOT . '/layouts/components/com_board');
-
+		// Remove content_type
 		$db = Factory::getDbo();
 		// Category
 		$query = $db->getQuery(true)
 			->delete($db->quoteName('#__content_types'))
 			->where($db->quoteName('type_alias') . ' IN (' . $db->quote('com_board.category') . ',' . $db->quote('com_board.item'));
 		$db->setQuery($query)->execute();
+
+		// Remove images
+		JFolder::delete(JPATH_ROOT . '/images/board');
+
+		// Remove layouts
+		JFolder::delete(JPATH_ROOT . '/layouts/components/com_board');
 	}
 
 	/**
