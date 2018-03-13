@@ -31,7 +31,6 @@ class com_BoardInstallerScript
 		$this->createImageFolders();
 		$this->createRootCategory();
 
-
 		return true;
 	}
 
