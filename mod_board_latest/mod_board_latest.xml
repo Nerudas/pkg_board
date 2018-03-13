@@ -70,9 +70,4 @@
 			</fieldset>
 		</fields>
 	</config>
-	<updateservers>
-		<server type="extension" priority="1" name="Board Latest Module">
-			https://update.nerudas.ru?extension=mod_board_latest
-		</server>
-	</updateservers>
 </extension>

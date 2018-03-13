@@ -63,9 +63,4 @@
 			</fieldset>
 		</fields>
 	</config>
-	<updateservers>
-		<server type="extension" priority="1" name="Board Categories Module">
-			https://update.nerudas.ru?extension=mod_board_categories
-		</server>
-	</updateservers>
 </extension>

@@ -67,9 +67,4 @@
 		<folder>js</folder>
 		<folder>images</folder>
 	</media>
-	<updateservers>
-		<server type="extension" priority="1" name="Board Component">
-			https://update.nerudas.ru?extension=com_board
-		</server>
-	</updateservers>
 </extension>
