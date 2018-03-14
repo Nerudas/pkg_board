@@ -15,8 +15,6 @@ use Joomla\CMS\Language\Text;
 
 class BoardHelper extends ContentHelper
 {
-	public static $extension = 'com_board';
-
 	/**
 	 * Configure the Linkbar.
 	 *
