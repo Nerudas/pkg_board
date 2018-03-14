@@ -112,7 +112,7 @@ class BoardModelMap extends ListModel
 	 *
 	 * @since  1.0.0
 	 */
-	protected function populateState($ordering = 'i.created', $direction = 'desc')
+	protected function populateState($ordering = null, $direction = null)
 	{
 
 		$app  = Factory::getApplication();
@@ -175,6 +175,8 @@ class BoardModelMap extends ListModel
 		$this->setState('filter.for_when', $for_when);
 
 		// List state information.
+		$ordering  = empty($ordering) ? 'i.created' : $ordering;
+		$direction = empty($direction) ? 'desc' : $direction;
 		parent::populateState($ordering, $direction);
 
 		// Set limit & limitstart for query.

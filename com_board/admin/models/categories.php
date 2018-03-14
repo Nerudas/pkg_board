@@ -62,7 +62,7 @@ class BoardModelCategories extends ListModel
 	 *
 	 * @since  1.0.0
 	 */
-	protected function populateState($ordering = 'c.lft', $direction = 'asc')
+	protected function populateState($ordering = null, $direction = null)
 	{
 		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
 		$this->setState('filter.search', $search);
@@ -77,6 +77,8 @@ class BoardModelCategories extends ListModel
 		$this->setState('filter.tags', $tags);
 
 		// List state information.
+		$ordering  = empty($ordering) ? 'c.lft' : $ordering;
+		$direction = empty($direction) ? 'asc' : $direction;
 		parent::populateState($ordering, $direction);
 	}
 

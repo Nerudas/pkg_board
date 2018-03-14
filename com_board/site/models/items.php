@@ -76,7 +76,7 @@ class BoardModelItems extends ListModel
 	 *
 	 * @since  1.0.0
 	 */
-	protected function populateState($ordering = 'i.created', $direction = 'desc')
+	protected function populateState($ordering = null, $direction = null)
 	{
 		$app  = Factory::getApplication('site');
 		$user = Factory::getUser();
@@ -147,6 +147,8 @@ class BoardModelItems extends ListModel
 		$this->setState('list.start', $app->input->get('limitstart', 0, 'uint'));
 
 		// Set ordering & direction for query.
+		$ordering  = empty($ordering) ? 'i.created' : $ordering;
+		$direction = empty($direction) ? 'desc' : $direction;
 		$this->setState('list.ordering', $ordering);
 		$this->setState('list.direction', $direction);
 	}
