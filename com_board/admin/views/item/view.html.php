@@ -118,7 +118,7 @@ class BoardViewItem extends HtmlView
 		Factory::getApplication()->input->set('hidemainmenu', true);
 		$isNew      = ($this->item->id == 0);
 		$this->user = Factory::getUser();
-		$canDo      = JHelperContent::getActions('com_board', 'item', $this->item->id);
+		$canDo      = BoardHelper::getActions('com_board', 'item', $this->item->id);
 
 		if ($isNew)
 		{

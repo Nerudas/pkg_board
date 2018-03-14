@@ -89,7 +89,7 @@ class BoardViewCategory extends HtmlView
 		Factory::getApplication()->input->set('hidemainmenu', true);
 		$isNew      = ($this->item->id == 0);
 		$this->user = Factory::getUser();
-		$canDo      = JHelperContent::getActions('com_board', 'category', $this->item->id);
+		$canDo      = BoardHelper::getActions('com_board', 'category', $this->item->id);
 
 		if ($isNew)
 		{
