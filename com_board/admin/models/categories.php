@@ -133,7 +133,6 @@ class BoardModelCategories extends ListModel
 
 		// Filter by published state
 		$published = $this->getState('filter.published');
-
 		if (is_numeric($published))
 		{
 			$query->where('c.state = ' . (int) $published);
