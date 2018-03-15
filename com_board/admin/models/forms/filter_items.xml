@@ -11,9 +11,7 @@
 		<field name="access" type="accesslevel" onchange="this.form.submit();">
 			<option value="">JOPTION_SELECT_ACCESS</option>
 		</field>
-		<field name="author_id" type="boardauthor" onchange="this.form.submit();">
-			<option value="">JOPTION_SELECT_AUTHOR</option>
-		</field>
+		<field name="created_by" type="user"/>
 		<field name="category" type="boardcategory" onchange="this.form.submit();"
 			   default="">
 			<option value="">JOPTION_SELECT_CATEGORY</option>

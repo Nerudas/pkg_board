@@ -85,8 +85,8 @@ class BoardModelItems extends ListModel
 		$access = $this->getUserStateFromRequest($this->context . '.filter.access', 'filter_access');
 		$this->setState('filter.access', $access);
 
-		$authorId = $this->getUserStateFromRequest($this->context . '.filter.author_id', 'filter_author_id');
-		$this->setState('filter.author_id', $authorId);
+		$created_by = $this->getUserStateFromRequest($this->context . '.filter.created_by', 'filter_created_by');
+		$this->setState('filter.created_by', $created_by);
 
 		$region = $this->getUserStateFromRequest($this->context . '.filter.region', 'filter_region', '');
 		$this->setState('filter.region', $region);
@@ -118,7 +118,7 @@ class BoardModelItems extends ListModel
 		$id .= ':' . $this->getState('filter.search');
 		$id .= ':' . serialize($this->getState('filter.access'));
 		$id .= ':' . $this->getState('filter.published');
-		$id .= ':' . $this->getState('filter.author_id');
+		$id .= ':' . $this->getState('filter.created_by');
 		$id .= ':' . $this->getState('filter.region');
 		$id .= ':' . $this->getState('filter.category');
 
@@ -186,12 +186,12 @@ class BoardModelItems extends ListModel
 			$query->where('(i.state = 0 OR i.state = 1)');
 		}
 
-		// Filter by author
-		$authorId = $this->getState('filter.author_id');
+		// Filter by created_by
+		$created_by = $this->getState('filter.created_by');
 
-		if (is_numeric($authorId))
+		if (is_numeric($created_by))
 		{
-			$query->where('i.created_by = ' . (int) $authorId);
+			$query->where('i.created_by = ' . (int) $created_by);
 		}
 
 		// Filter by category
