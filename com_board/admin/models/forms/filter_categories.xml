@@ -12,8 +12,6 @@
 			<option value="">JOPTION_SELECT_ACCESS</option>
 		</field>
 		<field name="tags" type="advtags"
-			   label="JTAG"
-			   description="JTAG_DESC"
 			   layout="joomla.form.field.advtags.select"
 			   multiple="true"
 			   class="multipleTags"
