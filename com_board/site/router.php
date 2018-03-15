@@ -21,7 +21,7 @@ use Joomla\CMS\Component\Router\Rules\StandardRules;
 class BoardRouter extends RouterView
 {
 	/**
-	 * JZPages Component router constructor
+	 * Router constructor
 	 *
 	 * @param   JApplicationCms $app  The application object
 	 * @param   JMenu           $menu The menu object to work with
@@ -62,9 +62,8 @@ class BoardRouter extends RouterView
 		$this->attachRule(new NomenuRules($this));
 	}
 
-
 	/**
-	 * Method to get the segment(s) for a category
+	 * Method to get the segment(s) for a items
 	 *
 	 * @param   string $id    ID of the category to retrieve the segments for
 	 * @param   array  $query The request that is built right now
@@ -73,7 +72,7 @@ class BoardRouter extends RouterView
 	 *
 	 * @since  1.0.0
 	 */
-	public function getCategorySegment($id, $query)
+	public function getItemsSegment($id, $query)
 	{
 		$path = array();
 
@@ -99,7 +98,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the segment(s) for a list
+	 * Method to get the segment(s) for a list view
 	 *
 	 * @param   string $id    ID of the category to retrieve the segments for
 	 * @param   array  $query The request that is built right now
@@ -110,11 +109,11 @@ class BoardRouter extends RouterView
 	 */
 	public function getListSegment($id, $query)
 	{
-		return $this->getCategorySegment($id, $query);
+		return $this->getItemsSegment($id, $query);
 	}
 
 	/**
-	 * Method to get the segment(s) for a map
+	 * Method to get the segment(s) for a map view
 	 *
 	 * @param   string $id    ID of the category to retrieve the segments for
 	 * @param   array  $query The request that is built right now
@@ -125,11 +124,11 @@ class BoardRouter extends RouterView
 	 */
 	public function getMapSegment($id, $query)
 	{
-		return $this->getCategorySegment($id, $query);
+		return $this->getItemsSegment($id, $query);
 	}
 
 	/**
-	 * Method to get the segment(s) for item
+	 * Method to get the segment(s) for item view
 	 *
 	 * @param   string $id    ID of the item to retrieve the segments for
 	 * @param   array  $query The request that is built right now
@@ -144,7 +143,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the segment(s) for form
+	 * Method to get the segment(s) for form view
 	 *
 	 * @param   string $id    ID of the form to retrieve the segments for
 	 * @param   array  $query The request that is built right now
@@ -162,7 +161,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the id for a category
+	 * Method to get the id for a items
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
@@ -171,7 +170,7 @@ class BoardRouter extends RouterView
 	 *
 	 * @since  1.0.0
 	 */
-	public function getCategoryId($segment, $query)
+	public function getItemsId($segment, $query)
 	{
 
 		if (isset($query['id']))
@@ -199,7 +198,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the id for a List
+	 * Method to get the id for a List view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
@@ -210,11 +209,11 @@ class BoardRouter extends RouterView
 	 */
 	public function getListId($segment, $query)
 	{
-		return $this->getCategoryId($segment, $query);
+		return $this->getItemsId($segment, $query);
 	}
 
 	/**
-	 * Method to get the id for a Map
+	 * Method to get the id for a Map view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
@@ -225,11 +224,11 @@ class BoardRouter extends RouterView
 	 */
 	public function getMapId($segment, $query)
 	{
-		return $this->getCategoryId($segment, $query);
+		return $this->getItemsId($segment, $query);
 	}
 
 	/**
-	 * Method to get the id for item
+	 * Method to get the id for map view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
@@ -244,7 +243,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the id for item
+	 * Method to get the id for form view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
@@ -264,7 +263,6 @@ class BoardRouter extends RouterView
 
 		return false;
 	}
-
 }
 
 function boardBuildRoute(&$query)
