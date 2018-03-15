@@ -204,7 +204,7 @@ class BoardModelItems extends ListModel
 			->join('LEFT', '#__regions AS r ON r.id = 
 					(CASE i.region WHEN ' . $db->quote('*') . ' THEN 100 ELSE i.region END)');
 
-		// Filter by access level on categories.
+		// Filter by access level.
 		if (!$user->authorise('core.admin'))
 		{
 			$groups = implode(',', $user->getAuthorisedViewLevels());
