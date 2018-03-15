@@ -21,9 +21,7 @@ class BoardHelperRoute extends RouteHelper
 	 *
 	 * @return  string
 	 *
-	 * @since  1.0.0
-	 *
-	 * @throws  \InvalidArgumentException
+	 * @since  1.0.0n
 	 */
 	public static function getListRoute($catid = 1)
 	{
@@ -39,8 +37,6 @@ class BoardHelperRoute extends RouteHelper
 	 * @return  string
 	 *
 	 * @since  1.0.0
-	 *
-	 * @throws  \InvalidArgumentException
 	 */
 	public static function getItemRoute($id = null, $catid = 1)
 	{
@@ -67,7 +63,6 @@ class BoardHelperRoute extends RouteHelper
 	 * @return  string
 	 *
 	 * @since  1.0.0
-	 *
 	 */
 	public static function getFormRoute($id = null, $catid = 1, $category = null)
 	{
@@ -85,15 +80,13 @@ class BoardHelperRoute extends RouteHelper
 	}
 
 	/**
-	 * Fetches the category route
+	 * Fetches the map route
 	 *
 	 * @param   int $catid Category ID
 	 *
 	 * @return  string
 	 *
 	 * @since  1.0.0
-	 *
-	 * @throws  \InvalidArgumentException
 	 */
 	public static function getMapRoute($catid = 1)
 	{
