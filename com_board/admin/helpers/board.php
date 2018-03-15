@@ -31,7 +31,7 @@ class BoardHelper extends ContentHelper
 			$vName == 'items');
 
 		JHtmlSidebar::addEntry(
-			JText::_('COM_BOARD_CATEGORIES'),
+			Text::_('COM_BOARD_CATEGORIES'),
 			'index.php?option=com_board&view=categories',
 			$vName == 'categories'
 		);

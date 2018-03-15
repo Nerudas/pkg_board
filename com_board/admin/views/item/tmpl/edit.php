@@ -81,7 +81,7 @@ $doc->addScriptDeclaration('
 		echo HTMLHelper::_('bootstrap.endTab');
 		?>
 
-		<?php echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'publishing', JText::_('JGLOBAL_FIELDSET_PUBLISHING')); ?>
+		<?php echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'publishing', Text::_('JGLOBAL_FIELDSET_PUBLISHING')); ?>
 		<div class="row-fluid form-horizontal-desktop">
 			<div class="span6">
 				<?php echo $this->form->renderFieldset('publishingdata'); ?>

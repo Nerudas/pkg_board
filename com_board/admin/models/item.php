@@ -492,7 +492,7 @@ class BoardModelItem extends AdminModel
 		// Access checks.
 		if (!Factory::getUser()->authorise('core.create', 'com_board'))
 		{
-			throw new Exception(JText::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
+			throw new Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
 		foreach ($pks as $pk)

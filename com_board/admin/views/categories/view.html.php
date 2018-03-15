@@ -158,7 +158,7 @@ class BoardViewCategories extends HtmlView
 		return [
 			'c.state'      => Text::_('JSTATUS'),
 			'c.id'         => Text::_('JGRID_HEADING_ID'),
-			'c.title'      => JText::_('JGLOBAL_TITLE'),
+			'c.title'      => Text::_('JGLOBAL_TITLE'),
 			'access_level' => Text::_('JGRID_HEADING_ACCESS'),
 		];
 	}

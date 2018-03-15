@@ -149,7 +149,7 @@ $columns = 6;
 							<?php if ((int) $item->created_by != 0) : ?>
 								<a class="hasTooltip"
 								   href="<?php echo Route::_('index.php?option=com_users&task=user.edit&id=' . (int) $item->created_by); ?>"
-								   title="<?php echo JText::_('JAUTHOR'); ?>">
+								   title="<?php echo Text::_('JAUTHOR'); ?>">
 									<?php echo $this->escape($item->author_name); ?></a>
 							<?php endif; ?>
 						</td>
