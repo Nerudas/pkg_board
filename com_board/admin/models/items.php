@@ -136,10 +136,8 @@ class BoardModelItems extends ListModel
 	protected function getListQuery()
 	{
 		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-		$user  = Factory::getUser();
-
-		$query->select('i.*')
+		$query = $db->getQuery(true)
+			->select('i.*')
 			->from($db->quoteName('#__board_items', 'i'));
 
 		// Join over the users for the author.
@@ -174,13 +172,6 @@ class BoardModelItems extends ListModel
 			$regions[]   = $regionModel->getRegion($region)->parent;
 			$regions     = array_unique($regions);
 			$query->where($db->quoteName('i.region') . ' IN (' . implode(',', $regions) . ')');
-		}
-
-		// Filter by access level on categories.
-		if (!$user->authorise('core.admin'))
-		{
-			$groups = implode(',', $user->getAuthorisedViewLevels());
-			$query->where('i.access IN (' . $groups . ')');
 		}
 
 		// Filter by published state

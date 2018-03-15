@@ -11,7 +11,6 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -116,10 +115,8 @@ class BoardModelCategories extends ListModel
 	protected function getListQuery()
 	{
 		$db    = $this->getDbo();
-		$query = $db->getQuery(true);
-		$user  = Factory::getUser();
-
-		$query->select('c.*')
+		$query = $db->getQuery(true)
+			->select('c.*')
 			->from($db->quoteName('#__board_categories', 'c'))
 			->where($db->quoteName('c.alias') . ' <> ' . $db->quote('root'));
 
@@ -138,13 +135,6 @@ class BoardModelCategories extends ListModel
 			$access = ArrayHelper::toInteger($access);
 			$access = implode(',', $access);
 			$query->where('с.access IN (' . $access . ')');
-		}
-
-		// Filter by access level on categories.
-		if (!$user->authorise('core.admin'))
-		{
-			$groups = implode(',', $user->getAuthorisedViewLevels());
-			$query->where('c.access IN (' . $groups . ')');
 		}
 
 		// Filter by published state
