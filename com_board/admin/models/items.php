@@ -232,14 +232,9 @@ class BoardModelItems extends ListModel
 			{
 				$query->where('i.id = ' . (int) substr($search, 3));
 			}
-			elseif (stripos($search, 'author:') === 0)
-			{
-				$search = $db->quote('%' . $db->escape(substr($search, 7), true) . '%');
-				$query->where('(ua.name LIKE ' . $search . ' OR ua.username LIKE ' . $search . ')');
-			}
 			else
 			{
-				$cols = array('i.title', 'r.name', 'i.text', 'i.tags_search', 'i.extra');
+				$cols = array('i.title', 'r.name', 'i.text', 'i.tags_search', 'ua.name', 'i.extra');
 				$sql  = array();
 				foreach ($cols as $col)
 				{
@@ -288,7 +283,7 @@ class BoardModelItems extends ListModel
 	}
 
 	/**
-	 * Method to get an array of categorytags.
+	 * Method to get an array of category tags.
 	 *
 	 * @param int $pk category id
 	 *
