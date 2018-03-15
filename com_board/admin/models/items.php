@@ -116,7 +116,7 @@ class BoardModelItems extends ListModel
 	protected function getStoreId($id = '')
 	{
 		$id .= ':' . $this->getState('filter.search');
-		$id .= ':' . serialize($this->getState('filter.access'));
+		$id .= ':' . $this->getState('filter.access');
 		$id .= ':' . $this->getState('filter.published');
 		$id .= ':' . $this->getState('filter.created_by');
 		$id .= ':' . $this->getState('filter.region');

@@ -97,7 +97,7 @@ class BoardModelCategories extends ListModel
 	protected function getStoreId($id = '')
 	{
 		$id .= ':' . $this->getState('filter.search');
-		$id .= ':' . serialize($this->getState('filter.access'));
+		$id .= ':' . $this->getState('filter.access');
 		$id .= ':' . $this->getState('filter.published');
 		$id .= ':' . serialize($this->getState('filter.tag'));
 
@@ -129,12 +129,6 @@ class BoardModelCategories extends ListModel
 		if (is_numeric($access))
 		{
 			$query->where('с.access = ' . (int) $access);
-		}
-		elseif (is_array($access))
-		{
-			$access = ArrayHelper::toInteger($access);
-			$access = implode(',', $access);
-			$query->where('с.access IN (' . $access . ')');
 		}
 
 		// Filter by published state
