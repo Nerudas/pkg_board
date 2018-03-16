@@ -413,7 +413,7 @@ class BoardModelItem extends AdminModel
 			$data['extra'] = (string) $registry;
 		}
 
-		// Get tags serach
+		// Get tags search
 		if (!empty($data['tags']))
 		{
 			$query = $db->getQuery(true)
@@ -443,6 +443,7 @@ class BoardModelItem extends AdminModel
 		if (parent::save($data))
 		{
 			$id = $this->getState($this->getName() . '.id');
+			$data['images'] = (!empty($data['images'])) ? $data['images'] : '';
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
 
 			return true;
