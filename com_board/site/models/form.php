@@ -50,7 +50,6 @@ class BoardModelForm extends BoardModelItem
 		$params = $app->getParams();
 		$this->setState('params', $params);
 
-		$this->setState('layout', $app->input->getString('layout', 'edit'));
 
 		parent::populateState();
 	}
