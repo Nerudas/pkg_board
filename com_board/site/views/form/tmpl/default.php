@@ -39,7 +39,7 @@ $doc->addScriptDeclaration('
 	<?php echo $this->form->renderField('title'); ?>
 	<?php echo $this->form->renderField('for_when'); ?>
 	<?php echo $this->form->renderField('actual'); ?>
-	<?php echo LayoutHelper::render('components.com_board.formcategories', $this); ?>
+	<?php echo LayoutHelper::render('components.com_board.form.categories', $this); ?>
 	<?php echo $this->form->renderField('text'); ?>
 
 	<?php echo $this->form->renderField('map'); ?>

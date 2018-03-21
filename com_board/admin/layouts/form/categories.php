@@ -14,8 +14,8 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
 HTMLHelper::_('jquery.framework');
-HTMLHelper::_('stylesheet', 'media/com_board/css/formcategories.min.css', array('version' => 'auto'));
-HTMLHelper::_('script', 'media/com_board/js/formcategories.min.js', array('version' => 'auto'));
+HTMLHelper::_('stylesheet', 'media/com_board/css/form-categories.min.css', array('version' => 'auto'));
+HTMLHelper::_('script', 'media/com_board/js/form-categories.min.js', array('version' => 'auto'));
 
 $form       = $displayData->getForm();
 $categories = $displayData->getCategories();
