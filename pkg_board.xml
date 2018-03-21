@@ -20,7 +20,7 @@
 		<folder type="module" id="mod_board_latest" client="site">mod_board_latest</folder>
 	</files>
 	<updateservers>
-		<server type="extension" priority="1" name="PKG_BOARD">
+		<server type="extension" priority="1" name="Board Package">
 			https://update.nerudas.ru/?extension=pkg_board
 		</server>
 	</updateservers>
