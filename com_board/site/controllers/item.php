@@ -26,7 +26,7 @@ class BoardControllerItem extends FormController
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	protected $view_list = 'category';
+	protected $view_list = 'list';
 
 	/**
 	 * The prefix to use with controller messages.
