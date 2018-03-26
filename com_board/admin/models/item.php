@@ -442,8 +442,12 @@ class BoardModelItem extends AdminModel
 
 		if (parent::save($data))
 		{
-			$id             = $this->getState($this->getName() . '.id');
-			$data['images'] = (!empty($data['images'])) ? $data['images'] : '';
+			$id = $this->getState($this->getName() . '.id');
+
+			// Save images
+			$data['images']      = (!isset($data['images'])) ? '' : $data['images'];
+			$data['imagefolder'] = (!isset($data['imagefolder'])) ? '' : $data['imagefolder'];
+
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
 
 			return true;
