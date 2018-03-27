@@ -53,6 +53,31 @@ class BoardControllerItem extends FormController
 	}
 
 	/**
+	 * Method to set contacts from profile
+	 *
+	 * @return  boolean  True if successful, false otherwise.
+	 *
+	 * @since  1.0.0
+	 */
+	public function setContacts()
+	{
+		$data    = $this->input->post->get('jform', array(), 'array');
+		$context = "$this->option.edit.$this->context";
+		$id      = (isset($data['id'])) ? $data['id'] : '';
+
+		$data['created_by'] = (!empty($data['created_by'])) ? $data['created_by'] : Factory::getUser()->id;
+		$data['contacts']   = $this->getModel()->getProfileContacts($data['created_by']);
+
+		// Save the data in the session.
+		Factory::getApplication()->setUserState($context . '.data', $data);
+
+		// Redirect back to the edit screen.
+		$this->setRedirect('index.php?option=com_board&view=item&layout=edit&id=' . $id);
+
+		return true;
+	}
+
+	/**
 	 * Method to update item icon
 	 *
 	 * @return  boolean  True if successful, false otherwise.

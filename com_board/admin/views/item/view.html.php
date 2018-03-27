@@ -152,5 +152,8 @@ class BoardViewItem extends HtmlView
 
 		JToolbarHelper::cancel('item.cancel', 'JTOOLBAR_CLOSE');
 		JToolbarHelper::divider();
+
+		JToolbarHelper::custom('item.setContacts', 'upload', '',
+			'COM_BOARD_ITEM_SET_CONTACTS', false);
 	}
 }

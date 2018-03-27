@@ -72,6 +72,29 @@ class BoardModelForm extends BoardModelItem
 	}
 
 	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return  mixed  The data for the form.
+	 *
+	 * @since  1.0.0
+	 */
+	protected function loadFormData()
+	{
+		$data = parent::loadFormData();
+		if (empty($data->id) && empty($data->created_by))
+		{
+			$data->created_by = Factory::getUser()->id;
+		}
+
+		if (empty($data->id) && !empty($data->created_by) && empty($data->contacts))
+		{
+			$data->contacts = parent::getProfileContacts($data->created_by);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Method to save the form data.
 	 *
 	 * @param   array $data The form data.

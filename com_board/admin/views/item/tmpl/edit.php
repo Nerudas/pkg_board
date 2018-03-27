@@ -26,7 +26,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 $doc->addScriptDeclaration('
 	Joomla.submitbutton = function(task)
 	{
-		if (task == "item.cancel" || document.formvalidator.isValid(document.getElementById("item-form")))
+		if (task == "item.cancel" || task == "item.setContacts" || document.formvalidator.isValid(document.getElementById("item-form")))
 		{
 			Joomla.submitform(task, document.getElementById("item-form"));
 		}

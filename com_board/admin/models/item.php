@@ -24,13 +24,22 @@ class BoardModelItem extends AdminModel
 {
 
 	/**
-	 * Type data
+	 * Categories
 	 *
 	 * @var    array
 	 *
 	 * @since  1.0.0
 	 */
 	protected $_categories = null;
+
+	/**
+	 * Profile contacts
+	 *
+	 * @var    array
+	 *
+	 * @since  1.0.0
+	 */
+	protected $_contacts = null;
 
 	/**
 	 * Imagefolder helper helper
@@ -125,7 +134,7 @@ class BoardModelItem extends AdminModel
 	}
 
 	/**
-	 * Method to get a single record.
+	 * Method to get categories array
 	 *
 	 *
 	 * @return  mixed  Object on success, false on failure.
@@ -289,7 +298,6 @@ class BoardModelItem extends AdminModel
 		return $form;
 	}
 
-
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
@@ -316,6 +324,34 @@ class BoardModelItem extends AdminModel
 		$this->preprocessData('com_board.item', $data);
 
 		return $data;
+	}
+
+	/**
+	 * Method to get profile contacts
+	 *
+	 * @param int $pk Profile ID
+	 *
+	 * @return  mixed  Object on success, false on failure.
+	 *
+	 * @since  1.0.0
+	 */
+	public function getProfileContacts($pk = null)
+	{
+		if (!is_array($this->_contacts))
+		{
+			$db    = Factory::getDbo();
+			$query = $db->getQuery(true)
+				->select('contacts')
+				->from('#__profiles')
+				->where('id = ' . $pk);
+			$db->setQuery($query);
+
+			$contacts        = new Registry($db->loadResult());
+			$this->_contacts = $contacts->toArray();
+		}
+
+		return $this->_contacts;
+
 	}
 
 	/**
@@ -532,5 +568,4 @@ class BoardModelItem extends AdminModel
 
 		return true;
 	}
-
 }
