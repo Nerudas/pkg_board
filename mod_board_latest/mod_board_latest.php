@@ -17,6 +17,8 @@ use Joomla\CMS\Router\Route;
 
 // Include route helper
 JLoader::register('BoardHelperRoute', JPATH_SITE . '/components/com_board/helpers/route.php');
+JLoader::register('ProfilesHelperRoute', JPATH_SITE . '/components/com_profiles/helpers/route.php');
+JLoader::register('CompaniesHelperRoute', JPATH_SITE . '/components/com_companies/helpers/route.php');
 
 // Load Language
 $language = Factory::getLanguage();

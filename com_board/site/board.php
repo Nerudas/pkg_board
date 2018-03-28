@@ -14,6 +14,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\BaseController;
 
 JLoader::register('BoardHelperRoute', JPATH_SITE . '/components/com_board/helpers/route.php');
+JLoader::register('ProfilesHelperRoute', JPATH_SITE . '/components/com_profiles/helpers/route.php');
+JLoader::register('CompaniesHelperRoute', JPATH_SITE . '/components/com_companies/helpers/route.php');
 
 $controller = BaseController::getInstance('Board');
 $controller->execute(Factory::getApplication()->input->get('task'));
