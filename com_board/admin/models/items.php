@@ -206,8 +206,7 @@ class BoardModelItems extends ListModel
 
 		// Filter by created_by
 		$created_by = $this->getState('filter.created_by');
-
-		if (is_numeric($created_by))
+		if (!empty($created_by))
 		{
 			$query->where('i.created_by = ' . (int) $created_by);
 		}
