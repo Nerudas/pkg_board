@@ -21,6 +21,7 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('behavior.multiselect');
 HTMLHelper::_('formbehavior.chosen', '.multipleForWhen', null, array('placeholder_text_multiple' => Text::_('COM_BOARD_ITEM_FOR_WHEN')));
 HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::stylesheet('media/com_board/css/admin-items.min.css', array('version' => 'auto'));
 
 $app       = Factory::getApplication();
 $doc       = Factory::getDocument();
@@ -145,12 +146,34 @@ $columns = 6;
 						<td class="small hidden-phone">
 							<?php echo $this->escape($item->access_level); ?>
 						</td>
-						<td class="small hidden-phone">
+						<td class="hidden-phone">
 							<?php if ((int) $item->created_by != 0) : ?>
-								<a class="hasTooltip"
-								   href="<?php echo Route::_('index.php?option=com_users&task=user.edit&id=' . (int) $item->created_by); ?>"
-								   title="<?php echo Text::_('JAUTHOR'); ?>">
-									<?php echo $this->escape($item->author_name); ?></a>
+								<div class="author">
+									<div class="avatar<?php echo ($item->author_online) ? ' online' : '' ?>"
+										 style="background-image: url('<?php echo $item->author_avatar; ?>')">
+									</div>
+									<div>
+										<div class="name">
+											<a class="hasTooltip nowrap" title="<?php echo Text::_('JACTION_EDIT'); ?>"
+											   target="_blank"
+											   href="<?php echo Route::_('index.php?option=com_users&task=user.edit&id='
+												   . (int) $item->author_id); ?>">
+												<?php echo $item->author_name; ?>
+											</a>
+										</div>
+										<?php if ($item->author_job): ?>
+											<div class="job">
+												<a class="hasTooltip nowrap"
+												   title="<?php echo Text::_('JACTION_EDIT'); ?>"
+												   target="_blank"
+												   href="<?php echo Route::_('index.php?option=com_companies&task=company.edit&id='
+													   . $item->author_job_id); ?>">
+													<?php echo $this->escape($item->author_job_name); ?>
+												</a>
+											</div>
+										<?php endif; ?>
+									</div>
+								</div>
 							<?php endif; ?>
 						</td>
 						<td class="small hidden-phone nowrap">

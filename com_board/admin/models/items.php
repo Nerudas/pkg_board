@@ -14,10 +14,11 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Date\Date;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Uri\Uri;
 
 class BoardModelItems extends ListModel
 {
-
 	/**
 	 * Category tags
 	 *
@@ -140,9 +141,26 @@ class BoardModelItems extends ListModel
 			->select('i.*')
 			->from($db->quoteName('#__board_items', 'i'));
 
-		// Join over the users for the author.
-		$query->select('ua.name AS author_name')
-			->join('LEFT', '#__users AS ua ON ua.id = i.created_by');
+		// Join over the author.
+		$offline      = (int) ComponentHelper::getParams('com_profiles')->get('offline_time', 5) * 60;
+		$offline_time = Factory::getDate()->toUnix() - $offline;
+		$query->select(array(
+			'author.id as author_id',
+			'author.name as author_name',
+			'author.avatar as author_avatar',
+			'author.status as author_status',
+			'(session.time IS NOT NULL) AS author_online',
+			'(company.id IS NOT NULL) AS author_job',
+			'company.id as author_job_id',
+			'company.name as author_job_name',
+			'company.logo as author_job_logo',
+			'employees.position as  author_position'
+		))
+			->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
+			->join('LEFT', '#__session AS session ON session.userid = author.id AND session.time > ' . $offline_time)
+			->join('LEFT', '#__companies_employees AS employees ON employees.user_id = author.id AND ' .
+				$db->quoteName('employees.key') . ' = ' . $db->quote(''))
+			->join('LEFT', '#__companies AS company ON company.id = employees.company_id AND company.state = 1');
 
 		// Join over the asset groups.
 		$query->select('ag.title AS access_level')
@@ -272,6 +290,13 @@ class BoardModelItems extends ListModel
 			foreach ($items as &$item)
 			{
 				$item->for_when = ($item->created >= $today->toSql()) ? $item->for_when : '';
+
+				$author_avatar       = (!empty($item->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $item->author_avatar)) ?
+					$item->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
+				$item->author_avatar = Uri::root(true) . '/' . $author_avatar;
+
+				$item->author_job_logo = (!empty($item->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $item->author_job_logo)) ?
+					Uri::root(true) . '/' . $item->author_job_logo : false;
 
 				// Get Tags
 				$item->tags = new TagsHelper;
