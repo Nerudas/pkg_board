@@ -20,6 +20,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\Uri\Uri;
 
 class BoardModelItem extends ItemModel
 {
@@ -104,6 +105,27 @@ class BoardModelItem extends ItemModel
 					->select('i.*')
 					->from('#__board_items AS i')
 					->where('i.id = ' . (int) $pk);
+
+				// Join over the author.
+				$offline      = (int) ComponentHelper::getParams('com_profiles')->get('offline_time', 5) * 60;
+				$offline_time = Factory::getDate()->toUnix() - $offline;
+				$query->select(array(
+					'author.id as author_id',
+					'author.name as author_name',
+					'author.avatar as author_avatar',
+					'author.status as author_status',
+					'(session.time IS NOT NULL) AS author_online',
+					'(company.id IS NOT NULL) AS author_job',
+					'company.id as author_job_id',
+					'company.name as author_job_name',
+					'company.logo as author_job_logo',
+					'employees.position as  author_position'
+				))
+					->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
+					->join('LEFT', '#__session AS session ON session.userid = author.id AND session.time > ' . $offline_time)
+					->join('LEFT', '#__companies_employees AS employees ON employees.user_id = author.id AND ' .
+						$db->quoteName('employees.key') . ' = ' . $db->quote(''))
+					->join('LEFT', '#__companies AS company ON company.id = employees.company_id AND company.state = 1');
 
 				// Join over the regions.
 				$query->select(array('r.id as region_id', 'r.name AS region_name'))
@@ -225,6 +247,15 @@ class BoardModelItem extends ItemModel
 
 				// Convert the metadata field
 				$data->metadata = new Registry($data->metadata);
+
+				// Prepare author data
+				$author_avatar         = (!empty($data->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $data->author_avatar)) ?
+					$data->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
+				$data->author_avatar   = Uri::root(true) . '/' . $author_avatar;
+				$data->author_link     = Route::_(ProfilesHelperRoute::getProfileRoute($data->author_id));
+				$data->author_job_logo = (!empty($data->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $data->author_job_logo)) ?
+					Uri::root(true) . '/' . $data->author_job_logo : false;
+				$data->author_job_link = Route::_(CompaniesHelperRoute::getCompanyRoute($data->author_job_id));
 
 				// Get Tags
 				$data->tags = new TagsHelper;
