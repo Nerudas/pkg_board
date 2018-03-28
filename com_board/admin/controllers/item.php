@@ -44,7 +44,6 @@ class BoardControllerItem extends FormController
 			JLoader::register('imageFolderHelper', JPATH_PLUGINS . '/fieldtypes/ajaximage/helpers/imagefolder.php');
 			$helper = new imageFolderHelper('images/board/items');
 			$helper->saveImagesValue($id, '#__board_items', $field, $value);
-			echo '<pre>', print_r('aaa', true), '</pre>';
 		}
 
 		$app->close();
