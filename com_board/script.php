@@ -35,46 +35,6 @@ class com_BoardInstallerScript
 	}
 
 	/**
-	 * This method is called after a component is updated.
-	 *
-	 * @param  \stdClass $parent - Parent object calling object.
-	 *
-	 * @return void
-	 *
-	 * @since  1.0.0
-	 */
-	public function update($parent)
-	{
-		$db    = Factory::getDbo();
-		$query = $db->getQuery(true)
-			->select(array('id', 'icon'))
-			->from($db->quoteName('#__board_categories'))
-			->where($db->quoteName('alias') . ' <> ' . $db->quote('root'));
-		$db->setQuery($query);
-		$categories = $db->loadObjectList('id');
-
-		foreach ($categories as $category)
-		{
-			$folder = JPATH_ROOT . '/images/board/categories/' . $category->id;
-			if (!JFolder::exists($folder))
-			{
-				JFolder::create($folder);
-				JFile::write($folder . '/index.html', '<!DOCTYPE html><title></title>');
-			}
-			if (!empty($category->icon))
-			{
-				$old  = JPATH_ROOT . '/' . $category->icon;
-				$icon = 'images/board/categories/' . $category->id . '/icon.' . JFile::getExt($category->icon);
-				$new  = JPATH_ROOT . '/' . $icon;
-
-				JFile::move($old, $new);
-				$category->icon = $icon;
-				$db->updateObject('#__board_categories', $category, 'id');
-			}
-		}
-	}
-
-	/**
 	 * Create root category
 	 *
 	 * @since  1.0.0
