@@ -294,8 +294,12 @@ class BoardModelCategory extends AdminModel
 		// Clear the cache
 		$this->cleanCache();
 
-		$id           = $table->id;
-		$data['icon'] = (!empty($data['icon'])) ? $data['icon'] : '';
+		$id = $table->id;
+
+		// Save images
+		$data['icon']        = (!empty($data['icon'])) ? $data['icon'] : '';
+		$data['imagefolder'] = (!empty($data['imagefolder'])) ? $data['imagefolder'] :
+			$this->imageFolderHelper->getItemImageFolder($id);
 		$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_categories', 'icon', $data['icon']);
 
 		return true;

@@ -482,7 +482,8 @@ class BoardModelItem extends AdminModel
 
 			// Save images
 			$data['images']      = (!isset($data['images'])) ? '' : $data['images'];
-			$data['imagefolder'] = (!isset($data['imagefolder'])) ? '' : $data['imagefolder'];
+			$data['imagefolder'] = (!empty($data['imagefolder'])) ? $data['imagefolder'] :
+				$this->imageFolderHelper->getItemImageFolder($id);
 
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
 
