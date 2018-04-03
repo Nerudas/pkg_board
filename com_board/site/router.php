@@ -228,7 +228,7 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the id for map view
+	 * Method to get the id for item view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
