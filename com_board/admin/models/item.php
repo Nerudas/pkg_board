@@ -487,6 +487,24 @@ class BoardModelItem extends AdminModel
 
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
 
+			// Import contacts
+			if (!empty($data['contacts']) && $data['contacts'] != '{}')
+			{
+				$query = $db->getQuery(true)
+					->select('contacts')
+					->from('#__profiles')
+					->where('id = ' . $data['created_by']);
+				$db->setQuery($query);
+				$authorContacts = $db->loadResult();
+				if (empty($authorContacts) || $authorContacts == '{}')
+				{
+					$update           = new stdClass();
+					$update->id       = $data['created_by'];
+					$update->contacts = $data['contacts'];
+					$db->updateObject('#__profiles', $update, 'id');
+				}
+			}
+
 			return true;
 		}
 
