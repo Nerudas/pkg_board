@@ -29,10 +29,6 @@
 		<field name="map" type="map"
 			   label="JGLOBAL_FIELD_MAP_LABEL"
 			   description="JGLOBAL_FIELD_MAP_DESC"/>
-		<field name="region" type="regions"
-			   label="JGLOBAL_FIELD_REGIONS_LABEL"
-			   description="JGLOBAL_FIELD_REGIONS_DESC"
-			   show_all="true"/>
 		<field name="state" type="list"
 			   label="JSTATUS"
 			   description="JFIELD_PUBLISHED_DESC"
@@ -52,6 +48,10 @@
 	</fieldset>
 
 	<fieldset name="contacts" label="COM_BOARD_ITEM_CONTACTS">
+		<field name="region" type="regions"
+			   label="JGLOBAL_FIELD_REGIONS_LABEL"
+			   description="JGLOBAL_FIELD_REGIONS_DESC"
+			   show_all="true"/>
 		<fields name="contacts">
 			<field name="phones" type="phones"
 				   label="JGLOBAL_FIELD_PHONES_LABEL"
