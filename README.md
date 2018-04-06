@@ -19,3 +19,6 @@ Module for displaying bulletin board categories
 
 * **Bulletin Board - Latest Module**  
 Module for displaying the latest Bulletin board items
+
+* **Bulletin Board - Administrator Module**  
+Module for displaying information about board items in the admin panel
