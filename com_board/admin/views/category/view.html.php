@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\MVC\View\HtmlView;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Application\SiteApplication;
 
 class BoardViewCategory extends HtmlView
 {
@@ -119,6 +120,24 @@ class BoardViewCategory extends HtmlView
 				JToolbarHelper::save('category.save');
 				JToolbarHelper::save2new('category.save2new');
 			}
+
+			// Go to page
+			JLoader::register('BoardHelperRoute', JPATH_SITE . '/components/com_board/helpers/route.php');
+			$siteRouter = SiteApplication::getRouter();
+
+			$listLink = $siteRouter->build(BoardHelperRoute::getListRoute($this->item->id))->toString();
+			$listLink = str_replace('administrator/', '', $listLink);
+
+			$mapLink = $siteRouter->build(BoardHelperRoute::getMapRoute($this->item->id))->toString();
+			$mapLink = str_replace('administrator/', '', $mapLink);
+
+			$toolbar = JToolBar::getInstance('toolbar');
+			$toolbar->appendButton('Custom', '<div class="btn-group">' .
+				'<a href="' . $listLink . '" class="btn btn-small btn-primary"
+					target="_blank">' . Text::_('COM_BOARD_GO_TO_LIST') . '</a>' .
+				'<a href="' . $mapLink . '" class="btn btn-small btn-primary"
+					target="_blank">' . Text::_('COM_BOARD_GO_TO_MAP') . '</a>' .
+				'</div>', 'goTo');
 		}
 
 		JToolbarHelper::cancel('category.cancel', 'JTOOLBAR_CLOSE');

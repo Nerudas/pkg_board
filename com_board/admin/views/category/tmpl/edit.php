@@ -22,6 +22,7 @@ $doc = Factory::getDocument();
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::stylesheet('media/com_board/css/admin-category.min.css', array('version' => 'auto'));
 
 $doc->addScriptDeclaration('
 	Joomla.submitbutton = function(task)

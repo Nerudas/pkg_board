@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\MVC\View\HtmlView;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Application\SiteApplication;
 
 class BoardViewItem extends HtmlView
 {
@@ -148,6 +149,17 @@ class BoardViewItem extends HtmlView
 				JToolbarHelper::save('item.save');
 				JToolbarHelper::save2new('item.save2new');
 			}
+
+			// Go to page
+			JLoader::register('BoardHelperRoute', JPATH_SITE . '/components/com_board/helpers/route.php');
+			$siteRouter = SiteApplication::getRouter();
+
+			$itemLink = $siteRouter->build(BoardHelperRoute::getItemRoute($this->item->id))->toString();
+			$itemLink = str_replace('administrator/', '', $itemLink);
+
+			$toolbar = JToolBar::getInstance('toolbar');
+			$toolbar->appendButton('Custom', '<a href="' . $itemLink . '" class="btn btn-small btn-primary"
+					target="_blank">' . Text::_('COM_BOARD_GO_TO_ITEM') . '</a>', 'goTo');
 		}
 
 		JToolbarHelper::cancel('item.cancel', 'JTOOLBAR_CLOSE');
