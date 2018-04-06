@@ -44,3 +44,12 @@
 	letter-spacing: 1px;
 	font-size: 10px;
 }
+
+#adminForm .tags {
+	margin-top: 3px;
+}
+
+#adminForm .tags .label {
+	margin-right: 3px;
+	margin-bottom: 3px;
+}

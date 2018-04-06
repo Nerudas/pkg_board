@@ -123,20 +123,20 @@ $columns = 6;
 								<?php endif; ?>
 
 							</div>
-							<div>
+							<div class="tags">
 								<?php if ($item->for_when == 'today'): ?>
-									<span class="label label-success" style="margin-bottom: 5px;">
+									<span class="label label-success">
 										<?php echo Text::_('COM_BOARD_ITEM_FOR_WHEN_TODAY'); ?>
 									</span>
 
 								<?php elseif ($item->for_when == 'tomorrow'): ?>
-									<span class="label label-info" style="margin-bottom: 5px;">
+									<span class="label label-info">
 										<?php echo Text::_('COM_BOARD_ITEM_FOR_WHEN_TOMORROW'); ?>
 									</span>
 								<?php endif; ?>
 								<?php if (!empty($item->tags->itemTags)): ?>
 									<?php foreach ($item->tags->itemTags as $tag): ?>
-										<span class="label label-inverse" style="margin-bottom: 5px;">
+										<span class="label label-inverse">
 											<?php echo $tag->title; ?>
 										</span>
 									<?php endforeach; ?>
