@@ -31,6 +31,9 @@ class ModBoardAdminHelper
 		{
 			$app = Factory::getApplication();
 
+			$language = Factory::getLanguage();
+			$language->load('com_board', JPATH_ADMINISTRATOR, $language->getTag(), true);
+
 			BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_board/models', 'BoardModel');
 			$model = BaseDatabaseModel::getInstance('Items', 'BoardModel', array('ignore_request' => false));
 			$app->setUserState('com_board.items.list', array(
