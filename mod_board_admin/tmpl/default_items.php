@@ -19,7 +19,7 @@ $columns = 5;
 
 ?>
 
-<table id="pagesList" class="table table-striped">
+<table class="table table-striped">
 	<thead>
 	<tr>
 		<th style="min-width:100px" class="nowrap">
