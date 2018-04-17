@@ -303,6 +303,7 @@ class BoardModelCategory extends AdminModel
 		{
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_categories', 'icon', $data['icon']);
 		}
+
 		return true;
 	}
 
