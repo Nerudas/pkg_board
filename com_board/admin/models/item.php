@@ -481,12 +481,12 @@ class BoardModelItem extends AdminModel
 			$id = $this->getState($this->getName() . '.id');
 
 			// Save images
-			$data['images']      = (!isset($data['images'])) ? '' : $data['images'];
 			$data['imagefolder'] = (!empty($data['imagefolder'])) ? $data['imagefolder'] :
 				$this->imageFolderHelper->getItemImageFolder($id);
-
-			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
-
+			if (isset($data['images']))
+			{
+				$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_items', 'images', $data['images']);
+			}
 			// Import contacts
 			if (!empty($data['contacts']) && $data['contacts'] != '{}')
 			{
