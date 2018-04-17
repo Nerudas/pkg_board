@@ -60,7 +60,7 @@ class ModBoardAdminHelper
 			}
 		}
 
-		throw new Exception(Text::_('MOD_PAGES_ADMIN_ERROR_MODULE_NOT_FOUND'), 404);
+		throw new Exception(Text::_('MOD_BOARD_ADMIN_ERROR_MODULE_NOT_FOUND'), 404);
 	}
 
 	/**
