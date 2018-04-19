@@ -1,7 +1,7 @@
 # Bulletin Board Package
 Extensions package for the site Bulletin Board section
 
-**Supported Joomla versions:** 3.8.0 or later  
+**Supported Joomla versions:** 3.8.0 and later  
 
 
 ## Internal project - No support
