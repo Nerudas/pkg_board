@@ -386,7 +386,7 @@ class BoardModelItem extends AdminModel
 			$data['region'] = $app->input->cookie->get('region', '*');
 		}
 
-//		Remove actual function
+//		//Remove actual function
 //		if (!empty($data['actual']) && empty($data['publish_down']))
 //		{
 //			$publish_down         = new \Joomla\CMS\Date\Date($data['actual']);
