@@ -13,12 +13,12 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\HTML\HTMLHelper;
 
 $user    = Factory::getUser();
 $columns = 5;
 
 ?>
-
 <table class="table table-striped">
 	<thead>
 	<tr>
@@ -30,6 +30,9 @@ $columns = 5;
 		</th>
 		<th width="10%" class="nowrap hidden-phone">
 			<?php echo Text::_('JGRID_HEADING_REGION'); ?>
+		</th>
+		<th width="10%" class="nowrap hidden-phone">
+			<?php echo Text::_('JGLOBAL_CREATED_DATE'); ?>
 		</th>
 		<th width="1%" class="nowrap hidden-phone">
 			<?php echo Text::_('JGLOBAL_HITS'); ?>
@@ -111,6 +114,9 @@ $columns = 5;
 			<td class="small hidden-phone nowrap">
 				<?php echo ($item->region !== '*') ? $item->region_name :
 					Text::_('JGLOBAL_FIELD_REGIONS_ALL'); ?>
+			</td>
+			<td class="nowrap small hidden-phone">
+				<?php echo $item->created > 0 ? HTMLHelper::_('date', $item->created, Text::_('DATE_FORMAT_LC2')) : '-' ?>
 			</td>
 			<td class="hidden-phone center">
 				<span class="badge badge-info">
