@@ -230,6 +230,38 @@ class BoardModelCategory extends AdminModel
 		}
 		$data['alias'] = $alias;
 
+		// Get tags search
+		if (!empty($data['tags']))
+		{
+			$db    = Factory::getDbo();
+			$query = $db->getQuery(true)
+				->select(array('id', 'title'))
+				->from('#__tags')
+				->where('id IN (' . implode(',', $data['tags']) . ')');
+			$db->setQuery($query);
+			$tags = $db->loadObjectList();
+
+			$tags_search = array();
+			$tags_map    = array();
+			$items_tags  = array();
+			foreach ($tags as $tag)
+			{
+				$tags_search[$tag->id] = $tag->title;
+				$tags_map[$tag->id]    = '[' . $tag->id . ']';
+				$items_tags[$tag->id]  = $tag->id;
+			}
+
+			$data['tags_search'] = implode(', ', $tags_search);
+			$data['tags_map']    = implode('', $tags_map);
+			$data['items_tags']  = implode(',', $items_tags);
+		}
+		else
+		{
+			$data['tags_search'] = '';
+			$data['tags_map']    = '';
+			$data['items_tags']  = '';
+		}
+
 		// Prepare attribs json
 		if (isset($data['attribs']) && is_array($data['attribs']))
 		{
