@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Helper\TagsHelper;
 
 class com_BoardInstallerScript
 {
@@ -336,92 +335,6 @@ class com_BoardInstallerScript
 					}
 				}
 			}
-		}
-	}
-
-	/**
-	 * Change database structure && delete association
-	 *
-	 * @param  \stdClass $parent - Parent object calling object.
-	 *
-	 * @return void
-	 *
-	 * @since  1.0.5
-	 */
-	public function update($parent)
-	{
-		$db      = Factory::getDbo();
-		$table   = '#__board_categories';
-		$columns = $db->getTableColumns($table);
-
-		$reSaveTags = false;
-
-		// Add Tags_search
-		if (!isset($columns['tags_search']))
-		{
-			$reSaveTags = true;
-			$db->setQuery("ALTER TABLE " . $table . " ADD `tags_search` MEDIUMTEXT NOT NULL DEFAULT '' AFTER `metadata`")
-				->query();
-		}
-
-		// tags_map
-		if (!isset($columns['tags_map']))
-		{
-			$reSaveTags = true;
-			$db->setQuery("ALTER TABLE " . $table . " ADD `tags_map` MEDIUMTEXT NOT NULL DEFAULT '' AFTER `tags_search`")
-				->query();
-		}
-
-		// Add items_tags
-		if (!isset($columns['items_tags']))
-		{
-			$reSaveTags = true;
-			$db->setQuery("ALTER TABLE " . $table . " ADD `items_tags` MEDIUMTEXT NOT NULL DEFAULT '' AFTER `tags_map`")
-				->query();
-		}
-
-		if ($reSaveTags)
-		{
-			$query = $db->getQuery(true)
-				->select('id')
-				->from($table);
-			$db->setQuery($query);
-			$ids = $db->loadColumn();
-			foreach ($ids as $id)
-			{
-				// Get Tags
-				$tags = new TagsHelper;
-				$tags->getItemTags('com_board.category', $id);
-				$tags = (!empty($tags->itemTags)) ? $tags->itemTags : array();
-
-				$tags_search = array();
-				$tags_map    = array();
-				$items_tags  = array();
-				foreach ($tags as $tag)
-				{
-					$tags_search[$tag->id] = $tag->title;
-					$tags_map[$tag->id]    = '[' . $tag->id . ']';
-					$items_tags[$tag->id]  = $tag->id;
-				}
-
-				$update              = new stdClass();
-				$update->id          = $id;
-				$update->tags_search = implode(', ', $tags_search);
-				$update->tags_map    = implode('', $tags_map);
-				$update->items_tags  = implode(',', $items_tags);
-
-				$db->updateObject($table, $update, 'id');
-			}
-		}
-
-		$table   = '#__board_items';
-		$columns = $db->getTableColumns($table);
-
-		// Change tags_map format
-		if ($columns['tags_map'] == 'longtext')
-		{
-			$db->setQuery("ALTER TABLE " . $table . " MODIFY `tags_map` MEDIUMTEXT NOT NULL DEFAULT ''")
-				->query();
 		}
 	}
 }
