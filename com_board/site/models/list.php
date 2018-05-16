@@ -26,7 +26,7 @@ class BoardModelList extends ListModel
 	 *
 	 * @since  1.0.0
 	 */
-	protected $_category = null;
+	protected $_category = array();
 
 	/**
 	 * Items Model
@@ -240,7 +240,7 @@ class BoardModelList extends ListModel
 	{
 		$pk = (!empty($pk)) ? $pk : (int) $this->getState('category.id');
 
-		if (!is_object($this->_category))
+		if (!isset($this->_category[$pk]))
 		{
 			try
 			{
@@ -288,7 +288,7 @@ class BoardModelList extends ListModel
 				// Convert metadata fields to objects.
 				$data->metadata = new Registry($data->metadata);
 
-				$this->_category = $data;
+				$this->_category[$pk] = $data;
 			}
 			catch (Exception $e)
 			{
@@ -299,12 +299,12 @@ class BoardModelList extends ListModel
 				else
 				{
 					$this->setError($e);
-					$this->_category = false;
+					$this->_category[$pk] = false;
 				}
 			}
 		}
 
-		return $this->_category;
+		return $this->_category[$pk];
 	}
 
 	/**
