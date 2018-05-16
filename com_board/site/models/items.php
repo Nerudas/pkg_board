@@ -19,6 +19,7 @@ use Joomla\Registry\Registry;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardModelItems extends ListModel
 {
@@ -472,11 +473,9 @@ class BoardModelItems extends ListModel
 	 */
 	public function getItems()
 	{
-		$items     = parent::getItems();
-		$today     = new Date(date('Y-m-d'));
-		$user      = Factory::getUser();
-		$component = ComponentHelper::getParams('com_board');
-		$placemark = $component->get('placemark', '');
+		$items = parent::getItems();
+		$today = new Date(date('Y-m-d'));
+		$user  = Factory::getUser();
 
 		if (!empty($items))
 		{
@@ -521,42 +520,6 @@ class BoardModelItems extends ListModel
 				$item->map = (!empty($item->latitude) && !empty($item->longitude) &&
 					$item->latitude !== '0.000000' && $item->longitude !== '0.000000') ? new Registry($item->map) : false;
 
-				// Get placemark
-				$item->placemark = ($item->map) ? $item->map->get('placemark') : false;
-				if ($item->placemark)
-				{
-					$item->placemark->id      = $item->id;
-					$item->placemark->link    = $item->link;
-					$item->placemark->options = array();
-					if (!empty($placemark))
-					{
-						if (!empty($placemark->customLayout))
-						{
-							$customLayout = htmlspecialchars_decode($placemark->customLayout);
-							$customLayout = str_replace('{id}', $item->id, $customLayout);
-							$customLayout = str_replace('{title}', $item->title, $customLayout);
-
-							$item->placemark->options['customLayout'] = $customLayout;
-						}
-
-						if (!empty($placemark->iconShape))
-						{
-							$iconShape = new stdClass();
-							if ((!empty($placemark->iconShape->type)))
-							{
-								$iconShape->type = $placemark->iconShape->type;
-							}
-							if ((!empty($placemark->iconShape->coordinates)))
-							{
-								$iconShape->coordinates = json_decode($placemark->iconShape->coordinates);
-							}
-
-							$item->placemark->options['iconShape'] = $iconShape;
-						}
-					}
-					$item->map->set('placemark', $item->placemark);
-				}
-
 				// Convert the images field to an array.
 				$registry     = new Registry($item->images);
 				$item->images = $registry->toArray();
@@ -575,6 +538,26 @@ class BoardModelItems extends ListModel
 				// Get Tags
 				$item->tags = new TagsHelper;
 				$item->tags->getItemTags('com_board.item', $item->id);
+
+				// Get placemark
+				$item->placemark = ($item->map) ? $item->map->get('placemark') : false;
+				if ($item->placemark)
+				{
+					$customLayout = LayoutHelper::render('components.com_board.map.placemark', $item);
+
+					$iconShape              = new stdClass();
+					$iconShape->type        = 'Polygon';
+					$iconShape->coordinates = json_decode(ComponentHelper::getParams('com_board')
+						->get('placemark_coordinates',
+							'[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]'));
+
+					$item->placemark->id                      = $item->id;
+					$item->placemark->link                    = $item->link;
+					$item->placemark->options                 = array();
+					$item->placemark->options['customLayout'] = $customLayout;
+					$item->placemark->options['iconShape']    = $iconShape;
+					$item->map->set('placemark', $item->placemark);
+				}
 
 			}
 		}

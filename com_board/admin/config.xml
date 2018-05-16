@@ -35,32 +35,14 @@
 			   label="COM_BOARD_PARAMS_MAP_LAYOUT"
 			   extension="com_board"
 			   view="map"/>
-	</fieldset>
-	<fieldset name="placemark" label="COM_BOARD_PARAMS_PLACEMARK">
-		<fields name="placemark">
-			<fields name="iconShape">
-				<field name="type" type="list"
-					   label="COM_BOARD_PARAMS_PLACEMARK_ICONSHAPE_TYPE"
-					   default="Polygon">
-					<option value="">JNONE</option>
-					<option value="Rectangle">COM_BOARD_PARAMS_PLACEMARK_ICONSHAPE_TYPE_RECTANGLE</option>
-					<option value="Circle">COM_BOARD_PARAMS_PLACEMARK_ICONSHAPE_TYPE_CIRCLE</option>
-					<option value="Polygon">COM_BOARD_PARAMS_PLACEMARK_ICONSHAPE_TYPE_POLYGON</option>
-				</field>
 
-				<field name="coordinates" type="text"
-					   label="COM_BOARD_PARAMS_PLACEMARK_ICONSHAPE_COORDINATES"
-					   class="input-xxlarge"
-					   default="[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]"/>
-			</fields>
-			<field name="customLayout" type="editor"
-				   label="COM_BOARD_PARAMS_PLACEMARK_LAYOUT"
-				   description="COM_BOARD_PARAMS_PLACEMARK_DESCRIPTION"
-				   default="&lt;style&gt;[data-board-placemark]{display:block;position:relative;width:48px;height:48px;margin-top:-48px;margin-left:-24px;color:inherit}[data-board-placemark] .title{position:absolute;top:0;left:48px;background:#fff;line-height:30px;max-width:150px;text-overflow:ellipsis;padding:0 5px;border:1px solid #e5e5e5;white-space:nowrap;overflow:hidden;font-size:14px;box-sizing:border-box}[data-board-placemark][data-viewed=&quot;true&quot;]{width:32px;height:32px;margin-top:-32px;margin-left:-16px;color:inherit;opacity:.75}[data-board-placemark][data-viewed=&quot;true&quot;] img{width:32px;height:32px}[data-board-placemark][data-viewed=&quot;true&quot;] .title{left:32px;line-height:15px;font-size:12px;padding:0 3px}&lt;/style&gt;&lt;div data-board-placemark=&quot;{id}&quot; class=&quot;placemark&quot; data-viewed=&quot;false&quot;&gt;&lt;img src=&quot;/media/com_board/images/placemark.png&quot; alt=&quot;{title}&quot;&gt;&lt;div class=&quot;title&quot;&gt;{title}&lt;/div&gt;&lt;/div&gt;"
-				   filter="JComponentHelper::filterText"/>
-		</fields>
-	</fieldset>
-	<fieldset name="cluster" label="COM_BOARD_PARAMS_CLUSTER">
+		<field type="note" label="COM_BOARD_PARAMS_PLACEMARK"/>
+		<field name="placemark_coordinates" type="text"
+			   label="COM_BOARD_PARAMS_PLACEMARK_COORDINATES"
+			   class="input-xxlarge"
+			   default="[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]"/>
+
+		<field type="note" label="COM_BOARD_PARAMS_CLUSTER"/>
 		<fields name="cluster">
 			<field name="gridSize" type="number"
 				   label="COM_BOARD_PARAMS_CLUSTER_GRIDSIZE"

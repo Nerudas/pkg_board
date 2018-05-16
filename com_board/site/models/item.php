@@ -21,6 +21,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardModelItem extends ItemModel
 {
@@ -94,8 +95,6 @@ class BoardModelItem extends ItemModel
 		{
 			$errorRedirect = Route::_(BoardHelperRoute::getListRoute());
 			$errorMsg      = Text::_('COM_BOARD_ERROR_ITEM_NOT_FOUND');
-			$component     = ComponentHelper::getParams('com_board');
-			$placemark     = $component->get('placemark', '');
 			try
 			{
 				$db   = $this->getDbo();
@@ -204,41 +203,6 @@ class BoardModelItem extends ItemModel
 				$data->map = (!empty($data->latitude) && !empty($data->longitude) &&
 					$data->latitude !== '0.000000' && $data->longitude !== '0.000000') ? new Registry($data->map) : false;
 
-				// Get placemark
-				$data->placemark = ($data->map) ? $data->map->get('placemark') : false;
-				if ($data->placemark)
-				{
-					$data->placemark->id      = $data->id;
-					$data->placemark->options = array();
-					if (!empty($placemark))
-					{
-						if (!empty($placemark->customLayout))
-						{
-							$customLayout = htmlspecialchars_decode($placemark->customLayout);
-							$customLayout = str_replace('{id}', $data->id, $customLayout);
-							$customLayout = str_replace('{title}', $data->title, $customLayout);
-
-							$data->placemark->options['customLayout'] = $customLayout;
-						}
-
-						if (!empty($placemark->iconShape))
-						{
-							$iconShape = new stdClass();
-							if ((!empty($placemark->iconShape->type)))
-							{
-								$iconShape->type = $placemark->iconShape->type;
-							}
-							if ((!empty($placemark->iconShape->coordinates)))
-							{
-								$iconShape->coordinates = json_decode($placemark->iconShape->coordinates);
-							}
-
-							$data->placemark->options['iconShape'] = $iconShape;
-						}
-					}
-					$data->map->set('placemark', $data->placemark);
-				}
-
 				// Convert the images field to an array.
 				$registry     = new Registry($data->images);
 				$data->images = $registry->toArray();
@@ -268,6 +232,27 @@ class BoardModelItem extends ItemModel
 
 				// If no access, the layout takes some responsibility for display of limited information.
 				$data->params->set('access-view', in_array($data->access, Factory::getUser()->getAuthorisedViewLevels()));
+
+				// Get placemark
+				$data->placemark = ($data->map) ? $data->map->get('placemark') : false;
+				if ($data->placemark)
+				{
+					$customLayout = LayoutHelper::render('components.com_board.map.placemark', $data);
+
+					$iconShape              = new stdClass();
+					$iconShape->type        = 'Polygon';
+					$iconShape->coordinates = json_decode(ComponentHelper::getParams('com_board')
+						->get('placemark_coordinates',
+							'[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]'));
+
+					$data->placemark->id                      = $data->id;
+					$data->placemark->link                    = $data->link;
+					$data->placemark->options                 = array();
+					$data->placemark->options['customLayout'] = $customLayout;
+					$data->placemark->options['iconShape']    = $iconShape;
+
+					$data->map->set('placemark', $data->placemark);
+				}
 
 				$this->_item[$pk] = $data;
 			}

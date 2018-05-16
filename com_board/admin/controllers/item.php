@@ -14,7 +14,7 @@ use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardControllerItem extends FormController
 {
@@ -77,7 +77,7 @@ class BoardControllerItem extends FormController
 	}
 
 	/**
-	 * Method to update item icon
+	 * Method to get Item placemark
 	 *
 	 * @return  boolean  True if successful, false otherwise.
 	 *
@@ -85,37 +85,18 @@ class BoardControllerItem extends FormController
 	 */
 	public function getPlacemark()
 	{
-		$app       = Factory::getApplication();
-		$data      = $this->input->post->get('jform', array(), 'array');
-		$component = ComponentHelper::getParams('com_board');
-		$placemark = $component->get('placemark', '');
-		$id        = (!empty($data['id'])) ? $data['id'] : 'x';
-		$title     = (!empty($data['title'])) ? $data['title'] : Text::_('JGLOBAL_TITLE');
+		$app  = Factory::getApplication();
+		$data = $this->input->post->get('jform', array(), 'array');
 
-		$options = array();
-		if (!empty($placemark->customLayout))
-		{
-			$customLayout = htmlspecialchars_decode($placemark->customLayout);
-			$customLayout = str_replace('{id}', $id, $customLayout);
-			$customLayout = str_replace('{title}', $title, $customLayout);
+		$options                 = array();
+		$options['customLayout'] = LayoutHelper::render('components.com_board.map.placemark', $data);
 
-			$options['customLayout'] = $customLayout;
-		}
-
-		if (!empty($placemark->iconShape))
-		{
-			$iconShape = new stdClass();
-			if ((!empty($placemark->iconShape->type)))
-			{
-				$iconShape->type = $placemark->iconShape->type;
-			}
-			if ((!empty($placemark->iconShape->coordinates)))
-			{
-				$iconShape->coordinates = json_decode($placemark->iconShape->coordinates);
-			}
-
-			$options['iconShape'] = $iconShape;
-		}
+		$iconShape              = new stdClass();
+		$iconShape->type        = 'Polygon';
+		$iconShape->coordinates = json_decode(ComponentHelper::getParams('com_board')
+			->get('placemark_coordinates',
+				'[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]'));
+		$options['iconShape']   = $iconShape;
 
 		echo new JsonResponse($options);
 		$app->close();
