@@ -62,7 +62,7 @@ class BoardModelItem extends AdminModel
 	public function __construct($config = array())
 	{
 		JLoader::register('imageFolderHelper', JPATH_PLUGINS . '/fieldtypes/ajaximage/helpers/imagefolder.php');
-		$this->imageFolderHelper = new imageFolderHelper('images/board/categories');
+		$this->imageFolderHelper = new imageFolderHelper('images/board/items');
 
 		parent::__construct($config);
 	}
@@ -307,19 +307,10 @@ class BoardModelItem extends AdminModel
 	 */
 	protected function loadFormData()
 	{
-		$app  = Factory::getApplication();
 		$data = Factory::getApplication()->getUserState('com_board.edit.item.data', array());
 		if (empty($data))
 		{
 			$data = $this->getItem();
-			// Pre-select some filters (Status,  Language, Access) in edit form if those have been selected in item Manager: Pages
-			if ($this->getState('item.id') == 0)
-			{
-				$filters = (array) $app->getUserState('com_board.categories.filter');
-				$data->set('access',
-					$app->input->getInt('access', (!empty($filters['access']) ? $filters['access'] : Factory::getConfig()->get('access')))
-				);
-			}
 		}
 		$this->preprocessData('com_board.item', $data);
 
