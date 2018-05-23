@@ -152,7 +152,7 @@ class BoardModelItem extends AdminModel
 				->select(array('c.id', 'c.title', 'c.icon', 'parent_id', 'level'))
 				->from($db->quoteName('#__board_categories', 'c'))
 				->where($db->quoteName('c.alias') . ' <> ' . $db->quote('root'))
-				->order('c.lft', 'ask')
+				->order('c.lft ASC')
 				->where('c.state =  1')
 				->where('c.access IN (' . implode(',', $access) . ')');;
 			$db->setQuery($query);
