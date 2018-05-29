@@ -496,7 +496,7 @@ class BoardModelItem extends AdminModel
 				}
 			}
 
-			return true;
+			return $id;
 		}
 
 		return false;

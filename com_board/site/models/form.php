@@ -105,11 +105,11 @@ class BoardModelForm extends BoardModelItem
 	 */
 	public function save($data)
 	{
-		if (parent::save($data))
+		if ($id = parent::save($data))
 		{
-			Factory::getApplication()->input->set('id', $this->getState($this->getName() . '.id'));
+			Factory::getApplication()->input->set('id', $id);
 
-			return true;
+			return $id;
 		}
 
 		return false;
