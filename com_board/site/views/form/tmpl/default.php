@@ -33,8 +33,7 @@ $doc->addScriptDeclaration('
 	};
 ');
 ?>
-<form action="<?php echo Route::_('index.php?option=com_board&view=list&id=' . $this->item->id); ?>"
-	  method="post"
+<form action="<?php echo Route::_(BoardHelperRoute::getFormRoute($this->item->id)); ?>" method="post"
 	  name="adminForm" id="item-form" class="form-validate" enctype="multipart/form-data">
 	<?php echo $this->form->renderField('title'); ?>
 	<?php echo $this->form->renderField('for_when'); ?>
