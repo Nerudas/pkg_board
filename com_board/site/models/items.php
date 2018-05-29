@@ -608,6 +608,7 @@ class BoardModelItems extends ListModel
 					$query = $db->getQuery(true)
 						->select(array('c.id', 'c.items_tags'))
 						->from($db->quoteName('#__board_categories', 'c'))
+						->where($db->quoteName('c.alias') . ' <> ' . $db->quote('root'))
 						->join('LEFT', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
 						->where('(this.id = ' . (int) $pk . ' OR c.id = ' . $pk . ')');
 					$db->setQuery($query);
