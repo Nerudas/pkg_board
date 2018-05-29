@@ -25,7 +25,7 @@ class BoardModelItems extends ListModel
 	 * @var    array
 	 * @since  1.0.0
 	 */
-	protected $_categoryTags = null;
+	protected $_categoryTags = array();
 
 	/**
 	 * Constructor.
@@ -317,44 +317,39 @@ class BoardModelItems extends ListModel
 	 */
 	public function getCategoryTags($pk = null)
 	{
-
-		if (!is_array($this->_categoryTags))
+		$pk = (!empty($pk)) ? $pk : $this->getState('filter.category');
+		if (!isset($this->_categoryTags[$pk]))
 		{
-			$pk = (!empty($pk)) ? $pk : $this->getState('filter.category');
-
-			$tags = array();
-			if (!empty($pk))
+			try
 			{
-				$db    = Factory::getDbo();
-				$query = $db->getQuery(true)
-					->select('c.id')
-					->from($db->quoteName('#__board_categories', 'c'))
-					->where($db->quoteName('c.alias') . ' <>' . $db->quote('root'));
-
-				if ($pk != 'without')
+				$tags = array();
+				if (!empty($pk))
 				{
-					$query->join('INNER', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
-						->where('this.id = ' . (int) $pk);
+					$db    = Factory::getDbo();
+					$query = $db->getQuery(true)
+						->select(array('c.id', 'c.items_tags'))
+						->from($db->quoteName('#__board_categories', 'c'))
+						->join('LEFT', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
+						->where('(this.id = ' . (int) $pk . ' OR c.id = ' . $pk . ')');
+					$db->setQuery($query);
+					$categories = $db->loadObjectList();
+
+					foreach ($categories as $category)
+					{
+						$tags[$category->id] = array_unique(explode(',', $category->items_tags));
+					}
+
 				}
-				$db->setQuery($query);
-
-				$categories   = $db->loadColumn();
-				$categories[] = $pk;
-				$categories   = array_unique($categories);
-
-				foreach ($categories as $category)
-				{
-					$tagsHelper = new TagsHelper;
-					$tagsHelper->getTagIds($category, 'com_board.category');
-					$tags[$category] = (!empty($tagsHelper->tags)) ? array_unique(explode(',', $tagsHelper->tags)) : array();
-				}
-
+				$this->_categoryTags[$pk] = $tags;
 			}
-
-			$this->_categoryTags = $tags;
+			catch (Exception $e)
+			{
+				$this->setError($e);
+				$this->_categoryTags[$pk] = false;
+			}
 		}
 
-		return $this->_categoryTags;
+		return $this->_categoryTags[$pk];
 	}
 
 }

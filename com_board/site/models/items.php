@@ -586,7 +586,7 @@ class BoardModelItems extends ListModel
 
 
 	/**
-	 * Method to get an array of categorytags.
+	 * Method to get an array of category tags.
 	 *
 	 * @param int $pk category id
 	 *
