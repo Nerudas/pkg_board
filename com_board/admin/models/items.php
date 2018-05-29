@@ -328,9 +328,13 @@ class BoardModelItems extends ListModel
 					$db    = Factory::getDbo();
 					$query = $db->getQuery(true)
 						->select(array('c.id', 'c.items_tags'))
-						->from($db->quoteName('#__board_categories', 'c'))
-						->join('LEFT', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
-						->where('(this.id = ' . (int) $pk . ' OR c.id = ' . $pk . ')');
+						->from($db->quoteName('#__board_categories', 'c'));
+
+					if ($pk != 'without')
+					{
+						$query->join('LEFT', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
+							->where('(this.id = ' . (int) $pk . ' OR c.id = ' . $pk . ')');
+					};
 					$db->setQuery($query);
 					$categories = $db->loadObjectList();
 
