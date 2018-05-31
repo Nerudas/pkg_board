@@ -16,6 +16,7 @@ use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Language\Text;
 
 class BoardControllerItem extends FormController
 {
@@ -107,6 +108,11 @@ class BoardControllerItem extends FormController
 		$id       = $app->input->getInt('id');
 		$catid    = $app->input->getInt('catid');
 		$category = $app->input->getInt('category', $data['category']);
+
+		if ($result)
+		{
+			$this->setMessage(Text::_($this->text_prefix . (($data['id'] == 0) ? '_SUBMIT' : '') . '_SAVE_SUCCESS'));
+		}
 
 		$return = ($result) ? BoardHelperRoute::getItemRoute($id) :
 			BoardHelperRoute::getFormRoute($id, $catid, $category);
