@@ -81,14 +81,18 @@ class BoardModelForm extends BoardModelItem
 	protected function loadFormData()
 	{
 		$data = parent::loadFormData();
-		if (empty($data->id) && empty($data->created_by))
-		{
-			$data->created_by = Factory::getUser()->id;
-		}
 
-		if (empty($data->id) && !empty($data->created_by) && empty($data->contacts))
+		if (is_object($data))
 		{
-			$data->contacts = parent::getProfileContacts($data->created_by);
+			if (empty($data->id) && empty($data->created_by))
+			{
+				$data->created_by = Factory::getUser()->id;
+			}
+
+			if (empty($data->id) && !empty($data->created_by) && empty($data->contacts))
+			{
+				$data->contacts = parent::getProfileContacts($data->created_by);
+			}
 		}
 
 		return $data;
