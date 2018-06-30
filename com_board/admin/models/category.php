@@ -331,6 +331,12 @@ class BoardModelCategory extends AdminModel
 		// Save images
 		$data['imagefolder'] = (!empty($data['imagefolder'])) ? $data['imagefolder'] :
 			$this->imageFolderHelper->getItemImageFolder($id);
+
+		if ($isNew)
+		{
+			$data['icon']      = (isset($data['icon'])) ? $data['icon'] : '';
+		}
+
 		if (isset($data['icon']))
 		{
 			$this->imageFolderHelper->saveItemImages($id, $data['imagefolder'], '#__board_categories', 'icon', $data['icon']);
