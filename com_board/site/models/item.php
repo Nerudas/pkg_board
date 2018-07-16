@@ -237,18 +237,23 @@ class BoardModelItem extends ItemModel
 				$data->placemark = ($data->map) ? $data->map->get('placemark') : false;
 				if ($data->placemark)
 				{
-					$customLayout = LayoutHelper::render('components.com_board.map.placemark', $data);
+					$html = LayoutHelper::render('components.com_board.placemark', $data);
+					preg_match('/data-placemark-coordinates="([^"]*)"/', $html, $matches);
+					$coordinates = '[]';
+					if (!empty($matches[1]))
+					{
+						$coordinates = $matches[1];
+						$html        = str_replace($matches[0], '', $html);
+					}
 
 					$iconShape              = new stdClass();
 					$iconShape->type        = 'Polygon';
-					$iconShape->coordinates = json_decode(ComponentHelper::getParams('com_board')
-						->get('placemark_coordinates',
-							'[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]'));
+					$iconShape->coordinates = json_decode($coordinates);
 
 					$data->placemark->id                      = $data->id;
 					$data->placemark->link                    = $data->link;
 					$data->placemark->options                 = array();
-					$data->placemark->options['customLayout'] = $customLayout;
+					$data->placemark->options['customLayout'] = $html;
 					$data->placemark->options['iconShape']    = $iconShape;
 
 					$data->map->set('placemark', $data->placemark);

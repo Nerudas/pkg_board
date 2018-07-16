@@ -16,6 +16,7 @@ use Joomla\CMS\Component\Router\RouterViewConfiguration;
 use Joomla\CMS\Component\Router\Rules\MenuRules;
 use Joomla\CMS\Component\Router\Rules\NomenuRules;
 use Joomla\CMS\Component\Router\Rules\StandardRules;
+use Joomla\CMS\Component\ComponentHelper;
 
 
 class BoardRouter extends RouterView
@@ -37,23 +38,13 @@ class BoardRouter extends RouterView
 
 		// Form route
 		$form = new RouterViewConfiguration('form');
-		$form->setKey('catid')->setParent($list, 'catid');
+		$form->setKey('tag_id')->setParent($list, 'tag_id');
 		$this->registerView($form);
 
 		// Item route
 		$item = new RouterViewConfiguration('item');
-		$item->setKey('id')->setParent($list, 'catid');
+		$item->setKey('id')->setParent($list, 'tag_id');
 		$this->registerView($item);
-
-		// Map route
-		$map = new RouterViewConfiguration('map');
-		$map->setKey('id')->setNestable();
-		$this->registerView($map);
-
-		// Map Item route (fake for nesestable)
-		$mapitem = new RouterViewConfiguration('mapitem');
-		$mapitem->setKey('id')->setParent($map, 'catid');
-		$this->registerView($mapitem);
 
 		parent::__construct($app, $menu);
 
@@ -63,69 +54,37 @@ class BoardRouter extends RouterView
 	}
 
 	/**
-	 * Method to get the segment(s) for a items
+	 * Method to get the segment(s) for list view
 	 *
-	 * @param   string $id    ID of the category to retrieve the segments for
+	 * @param   string $id    ID of the item to retrieve the segments for
 	 * @param   array  $query The request that is built right now
 	 *
 	 * @return  array|string  The segments of this item
 	 *
-	 * @since  1.0.0
+	 * @since 1.1.0
 	 */
-	public function getItemsSegment($id, $query)
+	public function getListSegment($id, $query)
 	{
 		$path = array();
-
-		while ($id > 1)
+		if ($id > 0)
 		{
 			$db      = Factory::getDbo();
 			$dbquery = $db->getQuery(true)
 				->select(array('id', 'alias', 'parent_id'))
-				->from('#__board_categories')
+				->from('#__tags')
 				->where('id =' . $id);
 			$db->setQuery($dbquery);
-			$category = $db->loadObject();
-
-			if ($category)
+			$tag = $db->loadObject();
+			if ($tag)
 			{
-				$path[$category->id] = $category->alias;
+				$path[$tag->id] = $tag->alias;
 			}
-			$id = ($category) ? $category->parent_id : 1;
 		}
 		$path[1] = 'root';
 
 		return $path;
 	}
 
-	/**
-	 * Method to get the segment(s) for a list view
-	 *
-	 * @param   string $id    ID of the category to retrieve the segments for
-	 * @param   array  $query The request that is built right now
-	 *
-	 * @return  array|string  The segments of this item
-	 *
-	 * @since  1.0.0
-	 */
-	public function getListSegment($id, $query)
-	{
-		return $this->getItemsSegment($id, $query);
-	}
-
-	/**
-	 * Method to get the segment(s) for a map view
-	 *
-	 * @param   string $id    ID of the category to retrieve the segments for
-	 * @param   array  $query The request that is built right now
-	 *
-	 * @return  array|string  The segments of this item
-	 *
-	 * @since  1.0.0
-	 */
-	public function getMapSegment($id, $query)
-	{
-		return $this->getItemsSegment($id, $query);
-	}
 
 	/**
 	 * Method to get the segment(s) for item view
@@ -154,77 +113,45 @@ class BoardRouter extends RouterView
 	 */
 	public function getFormSegment($id, $query)
 	{
-		$catid = (!empty($query['catid'])) ? $query['catid'] : 1;
-		$name  = (!empty($query['id'])) ? 'edit' : 'add';
+		$name = (!empty($query['id'])) ? 'edit' : 'add';
 
-		return array($catid => $name);
+		return array(1 => $name);
 	}
 
 	/**
-	 * Method to get the id for a items
+	 * Method to get the id for a list view
 	 *
 	 * @param   string $segment Segment to retrieve the ID for
 	 * @param   array  $query   The request that is parsed right now
 	 *
 	 * @return  mixed   The id of this item or false
 	 *
-	 * @since  1.0.0
+	 * @since 1.1.0
 	 */
-	public function getItemsId($segment, $query)
+	public function getListId($segment, $query)
 	{
-
 		if (isset($query['id']))
 		{
-			$parent = $query['id'];
+			$tags = ComponentHelper::getParams('com_board')->get('tags');
 
-			$db      = Factory::getDbo();
-			$dbquery = $db->getQuery(true)
-				->select(array('alias', 'id'))
-				->from('#__board_categories')
-				->where($db->quoteName('parent_id') . ' =' . $db->quote($parent));
-			$db->setQuery($dbquery);
-			$categories = $db->loadObjectList();
-
-			foreach ($categories as $category)
+			// Get tags
+			if (!empty($tags) && is_array($tags))
 			{
-				if ($category->alias == $segment)
-				{
-					return $category->id;
-				}
+				$db      = Factory::getDbo();
+				$dbquery = $db->getQuery(true)
+					->select('t.id')
+					->from($db->quoteName('#__tags', 't'))
+					->where($db->quoteName('t.alias') . ' <>' . $db->quote('root'))
+					->where('t.id IN (' . implode(',', $tags) . ')')
+					->where($db->quoteName('alias') . ' = ' . $db->quote($segment));
+				$db->setQuery($dbquery);
+				$id = $db->loadResult();
+
+				return (!empty($id)) ? $id : false;
 			}
 		}
 
 		return false;
-	}
-
-	/**
-	 * Method to get the id for a List view
-	 *
-	 * @param   string $segment Segment to retrieve the ID for
-	 * @param   array  $query   The request that is parsed right now
-	 *
-	 * @return  mixed   The id of this item or false
-	 *
-	 * @since  1.0.0
-	 */
-	public function getListId($segment, $query)
-	{
-		return $this->getItemsId($segment, $query);
-	}
-
-	/**
-	 * Method to get the id for a Map view
-	 *
-	 * @param   string $segment Segment to retrieve the ID for
-	 * @param   array  $query   The request that is parsed right now
-	 *
-	 * @return  mixed   The id of this item or false
-	 *
-	 * @since  1.0.0
-	 */
-	public function getMapId($segment, $query)
-	{
-		return $this->getItemsId($segment, $query);
 	}
 
 	/**
@@ -256,9 +183,7 @@ class BoardRouter extends RouterView
 	{
 		if (in_array($segment, array('form', 'add', 'edit')))
 		{
-			$catid = (!empty($query['catid'])) ? $query['catid'] : 1;
-
-			return (int) $catid;
+			return 1;
 		}
 
 		return false;

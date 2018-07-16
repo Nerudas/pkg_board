@@ -4,8 +4,8 @@
 		<field name="search" type="text"
 			   label="JSEARCH_FILTER"
 			   hint="JSEARCH_FILTER"/>
-		<field name="category" type="boardcategory"
-			   label="COM_BOARD_CATEGORY"
+		<field name="tag" type="boardtags"
+			   label="JTAG"
 			   links="true"/>
 		<field name="for_when" type="checkboxes"
 			   label="COM_BOARD_ITEM_FOR_WHEN">

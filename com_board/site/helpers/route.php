@@ -17,38 +17,30 @@ class BoardHelperRoute extends RouteHelper
 	/**
 	 * Fetches the list route
 	 *
-	 * @param   int $catid Category ID
+	 * @param  int $tag_id Tag ID
 	 *
 	 * @return  string
 	 *
 	 * @since  1.0.0n
 	 */
-	public static function getListRoute($catid = 1)
+	public static function getListRoute($tag_id = 1)
 	{
-		return 'index.php?option=com_board&view=list&id=' . $catid;
+		return 'index.php?option=com_board&view=list&id=' . $tag_id;
 	}
 
 	/**
 	 * Fetches the item route
 	 *
-	 * @param   int $catid Category ID
-	 * @param   int $id    Item ID
+	 * @param   int $id Item ID
 	 *
 	 * @return  string
 	 *
 	 * @since  1.0.0
 	 */
-	public static function getItemRoute($id = null, $catid = 1)
+	public static function getItemRoute($id = null)
 	{
-		$link = 'index.php?option=com_board&view=item';
-		if (!empty($id))
-		{
-			$link .= '&id=' . $id;
-		}
-		if (!empty($catid))
-		{
-			$link .= '&catid=' . $catid;
-		}
+		$link = 'index.php?option=com_board&view=item&tag_id=1&id=' . $id;
+
 
 		return $link;
 	}
@@ -56,40 +48,21 @@ class BoardHelperRoute extends RouteHelper
 	/**
 	 * Fetches the form route
 	 *
-	 * @param  int $id       Item ID
-	 * @param  int $catid    Category ID
-	 * @param  int $category Default Category ID
+	 * @param  int $id     Item ID
+	 * @param int  $tag_id Tag ID
 	 *
 	 * @return  string
 	 *
 	 * @since  1.0.0
 	 */
-	public static function getFormRoute($id = null, $catid = 1, $category = null)
+	public static function getFormRoute($id = null, $tag_id = 1)
 	{
-		$link = 'index.php?option=com_board&view=form&catid=' . $catid;
+		$link = 'index.php?option=com_board&view=form&tag_id=' .$tag_id;
 		if (!empty($id))
 		{
 			$link .= '&id=' . $id;
 		}
-		if (!empty($category))
-		{
-			$link .= '&category=' . $category;
-		}
 
 		return $link;
-	}
-
-	/**
-	 * Fetches the map route
-	 *
-	 * @param   int $catid Category ID
-	 *
-	 * @return  string
-	 *
-	 * @since  1.0.0
-	 */
-	public static function getMapRoute($catid = 1)
-	{
-		return 'index.php?option=com_board&view=map&id=' . $catid;
 	}
 }

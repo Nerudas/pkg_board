@@ -28,13 +28,6 @@
 					   required="true"
 					   addfieldpath="/administrator/components/com_board/models/fields"/>
 				<field name="limit" type="number" label="MOD_BOARD_LATEST_PARAMS_LIMIT" default="5"/>
-				<field name="allregions" type="radio"
-					   default="0"
-					   label="MOD_BOARD_LATEST_ALL_REGIONS"
-					   class="btn-group btn-group-yesno">
-					<option value="1">JYES</option>
-					<option value="0">JNO</option>
-				</field>
 				<field name="for_when" type="list"
 					   label="MOD_BOARD_LATEST_PARAMS_FOR_WHEN"
 					   default="">

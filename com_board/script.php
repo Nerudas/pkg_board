@@ -266,7 +266,6 @@ class com_BoardInstallerScript
 			'/components/com_board/views/map',
 			'/images/board/categories',
 			'/media/com_board/js',
-			'/media/com_board/images',
 		);
 		foreach ($folders as $folder)
 		{
@@ -288,6 +287,9 @@ class com_BoardInstallerScript
 			'/administrator/components/com_board/tables/categories.php',
 			'/components/com_board/models/fields/boardcategory.php',
 			'/components/com_board/models/map.php',
+			'/components/com_board/models/items.php',
+			'/components/com_board/models/forms/filter_items.xml',
+			'/components/com_board/models/fields/boardcategory.php',
 			'/components/com_board/controllers/map.php',
 			'/components/com_board/views/form/tmpl/default_categories.php',
 			'/media/com_board/css/admin-category.css',

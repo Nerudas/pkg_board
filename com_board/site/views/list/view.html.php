@@ -19,15 +19,6 @@ use Joomla\CMS\Uri\Uri;
 class BoardViewList extends HtmlView
 {
 	/**
-	 * Category object
-	 *
-	 * @var    object
-	 *
-	 * @since  1.0.0
-	 */
-	protected $category;
-
-	/**
 	 * The link to add form
 	 *
 	 * @var  string
@@ -35,23 +26,6 @@ class BoardViewList extends HtmlView
 	 * @since  1.0.0
 	 */
 	protected $addLink;
-
-	/**
-	 * The link to map view
-	 *
-	 * @var  string
-	 *
-	 * @since  1.0.0
-	 */
-	protected $mapLink;
-
-	/**
-	 * Child objects
-	 *
-	 * @var    array
-	 * @since  1.0.0
-	 */
-	protected $children;
 
 	/**
 	 * Parent object
@@ -107,6 +81,15 @@ class BoardViewList extends HtmlView
 	public $activeFilters;
 
 	/**
+	 * The link
+	 *
+	 * @var  string
+	 *
+	 * @since 1.0.0
+	 */
+	protected $link;
+
+	/**
 	 * Display the view
 	 *
 	 * @param   string $tpl The name of the template file to parse; automatically searches through the template paths.
@@ -119,17 +102,14 @@ class BoardViewList extends HtmlView
 	 */
 	public function display($tpl = null)
 	{
-		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$app = Factory::getApplication();
 
 		$this->state         = $this->get('State');
-		$this->category      = $this->get('Category');
-		$this->parent        = $this->get('Parent');
-		$this->addLink       = $this->category->addLink;
-		$this->mapLink       = $this->category->mapLink;
-		$this->listLink      = $this->category->listLink;
-		$this->link          = $this->listLink;
+		$this->tag           = $this->get('Tag');
+		$this->link          = $this->tag->link;
+		$this->addLink       = Route::_(BoardHelperRoute::getFormRoute());
 		$this->items         = $this->get('Items');
+		$this->params        = $this->state->get('params');
 		$this->pagination    = $this->get('Pagination');
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
@@ -139,108 +119,21 @@ class BoardViewList extends HtmlView
 		{
 			throw new Exception(implode("\n", $errors), 500);
 		}
-
-		// Create a shortcut for category.
-		$category          = $this->category;
-		$category->parent  = $this->parent;
-		$category->addLink = $this->addLink;
-		$category->mapLink = $this->mapLink;
-
-		// Merge category params. If this is category view, menu params override category params
-		// Otherwise, category params override menu item params
-		$this->params = $this->state->get('params');
-		$active       = $app->getMenu()->getActive();
-		$temp         = clone $this->params;
+		$active = $app->getMenu()->getActive();
 
 		// Check to see which parameters should take priority
 		if ($active)
 		{
 			$currentLink = $active->link;
-			// If the current view is the active item and an category view for this category, then the menu item params take priority
-			if (strpos($currentLink, 'view=list') && strpos($currentLink, '&catid=' . (string) $category->id))
+			// Load layout from active query (in case it is an alternative menu item)
+			if (strpos($currentLink, 'view=list') && isset($active->query['layout']))
 			{
-				// Load layout from active query (in case it is an alternative menu item)
-				if (isset($active->query['layout']))
-				{
-					$this->setLayout($active->query['layout']);
-				}
-
-				// Check for alternative layout of category
-				elseif ($layout = $category->params->get('list_layout'))
-				{
-					$this->setLayout($layout);
-				}
-
-				// $category->params are the category params, $temp are the menu item params
-				// Merge so that the menu item params take priority
-				$category->params->merge($temp);
+				$this->setLayout($active->query['layout']);
 			}
-			else
-			{
-				// Current view is not a single category, so the category params take priority here
-				// Merge the menu item params with the category params so that the category params take priority
-				$temp->merge($category->params);
-				$category->params = $temp;
-
-				// Check for alternative layouts (since we are not in a category menu item)
-				// category menu item layout takes priority over alt layout for an category
-				if ($layout = $category->params->get('list_layout'))
-				{
-					$this->setLayout($layout);
-				}
-			}
-		}
-		else
-		{
-			// Merge so that category params take priority
-			$temp->merge($category->params);
-			$category->params = $temp;
-
-			// Check for alternative layouts (since we are not in a category menu item)
-			// category menu item layout takes priority over alt layout for an category
-			if ($layout = $category->params->get('list_layout'))
-			{
-				$this->setLayout($layout);
-			}
-		}
-
-		/* Check for no 'access-view',
-		 * - Redirect guest users to login
-		 * - Deny access to logged users with 403 code
-		 * NOTE: we do not recheck for no access-view + show_noauth disabled ... since it was checked above
-		 */
-		if ($category->params->get('access-view') == false)
-		{
-			if ($user->get('guest'))
-			{
-
-				$login_url = Route::_('index.php?option=com_users&view=login&return=' . base64_encode(Uri::getInstance()));
-				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'notice');
-				$app->redirect($login_url, 403);
-			}
-			else
-			{
-				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-				$app->setHeader('status', 403, true);
-
-				return false;
-			}
-		}
-
-		// Title for root category
-		if ($active && $category->root)
-		{
-			$category->title = $active->title;
-		}
-
-		// Set search placeholder
-		if ($category->params->get('search_placeholder', ''))
-		{
-			$this->filterForm->setFieldAttribute('search', 'hint', $category->params->get('search_placeholder'), 'filter');
 		}
 
 		// Escape strings for HTML output
-		$this->pageclass_sfx = htmlspecialchars($this->category->params->get('pageclass_sfx'));
+		$this->pageclass_sfx = htmlspecialchars($this->params->get('pageclass_sfx'));
 
 		$this->_prepareDocument();
 
@@ -257,12 +150,10 @@ class BoardViewList extends HtmlView
 	protected function _prepareDocument()
 	{
 		$app      = Factory::getApplication();
-		$pathway  = $app->getPathway();
-		$category = $this->category;
-		$url      = rtrim(URI::root(), '/') . $category->listLink;
+		$url      = rtrim(URI::root(), '/') . $this->link;
 		$sitename = $app->get('sitename');
-		$menus    = $app->getMenu();
-		$menu     = $menus->getActive();
+		$pathway  = $app->getPathway();
+		$menu     = $app->getMenu()->getActive();
 		$id       = (int) @$menu->query['id'];
 
 		if ($menu)
@@ -271,29 +162,14 @@ class BoardViewList extends HtmlView
 		}
 		else
 		{
-			$this->params->def('page_heading', Text::_('COM_BOARD_CATEGORY'));
+			$this->params->def('page_heading', Text::_('COM_COMPANIES'));
 		}
-		$title = $this->params->get('page_title', $sitename);
 
 		// If the menu item does not concern this contact
-		if ($menu && ($menu->query['option'] !== 'com_board' || $menu->query['view'] !== 'list' || $id != $category->id))
+		if ($menu && ($menu->query['option'] !== 'com_board' || $menu->query['view'] !== 'list' || $id != $this->tag->id))
 		{
-			if ($category->title)
-			{
-				$title = $category->title;
-			}
-
 			$path   = array();
-			$path[] = array('title' => $title, 'link' => '');
-
-			$parent = $category->parent;
-			while ($parent && $parent->id > 1 &&
-				($menu->query['option'] !== 'com_board' || $menu->query['view'] === 'list' || $id != $parent->id))
-			{
-				$path[] = array('title' => $parent->title, 'link' => $parent->listLink);
-				$parent = $this->getModel()->getParent($parent->id);
-			}
-
+			$path[] = array('title' => $this->tag->title, 'link' => '');
 			foreach (array_reverse($path) as $item)
 			{
 				$pathway->addItem($item['title'], $item['link']);
@@ -321,53 +197,25 @@ class BoardViewList extends HtmlView
 		$this->document->setTitle($title);
 
 		// Set Meta Description
-		if (!empty($category->metadesc))
-		{
-			$this->document->setDescription($category->metadesc);
-		}
-		elseif ($this->params->get('menu-meta_description'))
+		if ($this->params->get('menu-meta_description'))
 		{
 			$this->document->setDescription($this->params->get('menu-meta_description'));
 		}
 
 		// Set Meta Keywords
-		if (!empty($category->metakey))
-		{
-			$this->document->setMetadata('keywords', $category->metakey);
-		}
-		elseif ($this->params->get('menu-meta_keywords'))
+		if ($this->params->get('menu-meta_keywords'))
 		{
 			$this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
 		}
 
 		// Set Meta Robots
-		if ($category->metadata->get('robots', ''))
-		{
-			$this->document->setMetadata('robots', $category->metadata->get('robots', ''));
-		}
-		elseif ($this->params->get('robots'))
+		if ($this->params->get('robots'))
 		{
 			$this->document->setMetadata('robots', $this->params->get('robots'));
 		}
 
-		// Set Meta Author
-		if ($app->get('MetaAuthor') == '1' && $category->metadata->get('author', ''))
-		{
-			$this->document->setMetaData('author', $category->metadata->get('author'));
-		}
-
-		// Set Meta Rights
-		if ($category->metadata->get('rights', ''))
-		{
-			$this->document->setMetaData('author', $category->metadata->get('rights'));
-		}
-
 		// Set Meta Image
-		if ($category->metadata->get('image', ''))
-		{
-			$this->document->setMetaData('image', URI::base() . $category->metadata->get('image'));
-		}
-		elseif ($this->params->get('menu-meta_image', ''))
+		if ($this->params->get('menu-meta_image', ''))
 		{
 			$this->document->setMetaData('image', Uri::base() . $this->params->get('menu-meta_image'));
 		}

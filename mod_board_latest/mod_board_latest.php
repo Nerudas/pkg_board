@@ -26,9 +26,9 @@ $language->load('com_board', JPATH_SITE, $language->getTag(), false);
 
 // Initialize model
 BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_board/models');
-$model = BaseDatabaseModel::getInstance('Items', 'BoardModel', array('ignore_request' => true));
+$model = BaseDatabaseModel::getInstance('List', 'BoardModel', array('ignore_request' => true));
 $model->setState('list.limit', $params->get('limit', 5));
-$model->setState('filter.category', $params->get('category', 1));
+$model->setState('tag.id', $params->get('tag_id', 1));
 if ((!Factory::getUser()->authorise('core.edit.state', 'com_board.item')) &&
 	(!Factory::getUser()->authorise('core.edit', 'com_board.item')))
 {
@@ -39,14 +39,12 @@ else
 	$model->setState('filter.published', array(0, 1));
 }
 $model->setState('filter.for_when', $params->get('for_when', ''));
-$model->setState('filter.allregions', $params->get('allregions', ''));
-$model->setState('filter.allregions', $params->get('allregions', ''));
 $model->setState('filter.onlymy', $params->get('onlymy', ''));
 $model->setState('filter.author_id', $params->get('author_id', ''));
 
 // Variables
 $items        = $model->getItems();
-$categoryLink = BoardHelperRoute::getListRoute($params->get('category', 1));
+$categoryLink = BoardHelperRoute::getListRoute($params->get('tag_id', 1));
 
 if (!empty($params->get('author_id', '')))
 {

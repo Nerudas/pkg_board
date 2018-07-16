@@ -15,36 +15,23 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Date\Date;
+use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Helper\TagsHelper;
+use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardModelList extends ListModel
 {
+
 	/**
-	 * Type data
+	 * This tag
 	 *
 	 * @var    object
-	 *
 	 * @since  1.0.0
 	 */
-	protected $_category = array();
-
-	/**
-	 * Items Model
-	 *
-	 * @var     bool|JModelLegacy
-	 *
-	 * @since  1.0.0
-	 */
-	protected $_itemsModel = null;
-
-	/**
-	 * Category parent data
-	 *
-	 * @var    array
-	 *
-	 * @since  1.0.0
-	 */
-	protected $_parent = null;
+	protected $_tag = null;
 
 	/**
 	 * Model context string.
@@ -56,30 +43,12 @@ class BoardModelList extends ListModel
 	public $_context = 'com_board.list';
 
 	/**
-	 * Category items array
-	 *
-	 * @var    array
-	 *
-	 * @since  1.0.0
-	 */
-	protected $_items = null;
-
-	/**
-	 * Category items array
-	 *
-	 * @var    JPagination
-	 *
-	 * @since  1.0.0
-	 */
-	protected $_pagination = null;
-
-	/**
 	 * Name of the filter form to load
 	 *
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	protected $filterFormName = 'filter_items';
+	protected $filterFormName = 'filter_list';
 
 	/**
 	 * Constructor.
@@ -134,7 +103,7 @@ class BoardModelList extends ListModel
 
 		// Set id state
 		$pk = $app->input->getInt('id', 1);
-		$this->setState('category.id', $pk);
+		$this->setState('tag.id', $pk);
 
 		// Load the parameters. Merge Global and Menu Item params into new object
 		$params     = $app->getParams();
@@ -213,275 +182,483 @@ class BoardModelList extends ListModel
 	 */
 	protected function getStoreId($id = '')
 	{
-		$id .= ':' . $this->getState('category.id');
 		$id .= ':' . serialize($this->getState('filter.published'));
 		$id .= ':' . $this->getState('filter.search');
 		$id .= ':' . serialize($this->getState('filter.price'));
 		$id .= ':' . serialize($this->getState('filter.payment_method'));
 		$id .= ':' . serialize($this->getState('filter.prepayment'));
-		$id .= ':' . $this->getState('filter.allregions');
 		$id .= ':' . $this->getState('filter.onlymy');
 		$id .= ':' . $this->getState('filter.author_id');
 		$id .= ':' . serialize($this->getState('filter.for_when'));
+		$id .= ':' . serialize($this->getState('filter.item_id'));
+		$id .= ':' . $this->getState('filter.item_id.include');
 
 		return parent::getStoreId($id);
 	}
 
+
 	/**
-	 * Method to get type data for the current type
+	 * Build an SQL query to load the list data.
 	 *
-	 * @param   integer $pk The id of the type.
+	 * @return  JDatabaseQuery
 	 *
-	 * @return  mixed object|false
-	 *
-	 * @since  1.0.0
+	 * @since  1.1.0
 	 */
-	public function getCategory($pk = null)
+	protected function getListQuery()
 	{
-		$pk = (!empty($pk)) ? $pk : (int) $this->getState('category.id');
+		$user  = Factory::getUser();
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true)
+			->select(array('i.*', 'r.name AS region_name'))
+			->from($db->quoteName('#__board_items', 'i'));
 
-		if (!isset($this->_category[$pk]))
+		// Join over the author.
+		$offline      = (int) ComponentHelper::getParams('com_profiles')->get('offline_time', 5) * 60;
+		$offline_time = Factory::getDate()->toUnix() - $offline;
+		$query->select(array(
+			'author.id as author_id',
+			'author.name as author_name',
+			'author.avatar as author_avatar',
+			'author.status as author_status',
+			'(session.time IS NOT NULL) AS author_online',
+			'(company.id IS NOT NULL) AS author_job',
+			'company.id as author_job_id',
+			'company.name as author_job_name',
+			'company.logo as author_job_logo',
+			'employees.position as  author_position'
+		))
+			->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
+			->join('LEFT', '#__session AS session ON session.userid = author.id AND session.time > ' . $offline_time)
+			->join('LEFT', '#__companies_employees AS employees ON employees.user_id = author.id AND ' .
+				$db->quoteName('employees.key') . ' = ' . $db->quote(''))
+			->join('LEFT', '#__companies AS company ON company.id = employees.company_id AND company.state = 1');
+
+
+		// Join over the regions.
+		$query->select(array('r.id as region_id', 'r.name AS region_name'))
+			->join('LEFT', '#__regions AS r ON r.id = 
+					(CASE i.region WHEN ' . $db->quote('*') . ' THEN 100 ELSE i.region END)');
+
+		// Filter by access level.
+		if (!$user->authorise('core.admin'))
 		{
-			try
+			$groups = implode(',', $user->getAuthorisedViewLevels());
+			$query->where('i.access IN (' . $groups . ')');
+		}
+
+		// Filter by price.
+		$price = $this->getState('filter.price');
+		if (is_array($price) && !empty($price))
+		{
+			if (!empty($price['from']) && !empty($price['to']))
 			{
-				$db    = $this->getDbo();
-				$query = $db->getQuery(true)
-					->select('c.*')
-					->from('#__board_categories AS c')
-					->where('c.id = ' . (int) $pk);
-
-				// Filter by published state.
-				$published = $this->getState('filter.published');
-				if (is_numeric($published))
+				$sql = $db->quoteName('i.price') . '  BETWEEN ' . $price['from'] . ' AND ' . $price['to'];
+				if (isset($price['contract']) && $price['contract'] == '-0')
 				{
-					$query->where('c.state = ' . (int) $published);
+					$sql .= ' OR ' . $db->quoteName('i.price') . ' = ' . $db->quote('-0');
 				}
-				elseif (is_array($published))
-				{
-					$query->where('c.state IN (' . implode(',', $published) . ')');
-				}
-
-				$db->setQuery($query);
-				$data = $db->loadObject();
-
-				if (empty($data))
-				{
-					return JError::raiseError(404, Text::_('COM_BOARD_ERROR_CATEGORY_NOT_FOUND'));
-				}
-
-				// Root
-				$data->root = ($data->id == 1);
-
-				// Links
-				$data->listLink = Route::_(BoardHelperRoute::getListRoute($data->id));
-				$data->addLink  = Route::_(BoardHelperRoute::getFormRoute());
-				$data->mapLink  = Route::_(BoardHelperRoute::getMapRoute($data->id));
-
-				// Convert parameter fields to objects.
-				$registry     = new Registry($data->attribs);
-				$data->params = clone $this->getState('params');
-				$data->params->merge($registry);
-
-				// If no access, the layout takes some responsibility for display of limited information.
-				$data->params->set('access-view', in_array($data->access, Factory::getUser()->getAuthorisedViewLevels()));
-
-				// Convert metadata fields to objects.
-				$data->metadata = new Registry($data->metadata);
-
-				$this->_category[$pk] = $data;
 			}
-			catch (Exception $e)
+			elseif (!empty($price['from']))
 			{
-				if ($e->getCode() == 404)
+				$sql = $db->quoteName('i.price') . '  >= ' . $price['from'];
+				if (isset($price['contract']) && $price['contract'] == '-0')
 				{
-					JError::raiseError(404, $e->getMessage());
+					$sql .= ' OR ' . $db->quoteName('i.price') . ' = ' . $db->quote('-0');
 				}
-				else
+			}
+			elseif (!empty($price['to']))
+			{
+				//$sql = $db->quoteName('i.price') . '  BETWEEN ' . $price['from'] . ' AND ' . $price['to'];
+				$sql = $db->quoteName('i.price') . '  <= ' . $price['to'];
+				if ($price['contract'] !== '-0')
 				{
-					$this->setError($e);
-					$this->_category[$pk] = false;
+					$sql .= ' AND ' . $db->quoteName('i.price') . ' <> ' . $db->quote('-0');
+				}
+			}
+
+			if (empty($sql) && isset($price['contract']) && $price['contract'] == '-0')
+			{
+				$sql = $db->quoteName('i.price') . ' = ' . $db->quote('-0');
+			}
+
+			if (!empty($sql))
+			{
+				$query->where('( ' . $sql . ')');
+			}
+		}
+
+		// Filter by payment_method.
+		$payment_method = $this->getState('filter.payment_method');
+		if (is_array($payment_method) && !empty($payment_method))
+		{
+			$payment_method[] = 'all';
+			foreach ($payment_method as &$value)
+			{
+				$value = $db->quote($value);
+			}
+			$payment_method = implode(',', $payment_method);
+
+			if (!empty($payment_method))
+			{
+				$query->where($db->quoteName('i.payment_method') . ' IN (' . $payment_method . ')');
+			}
+		}
+
+		// Filter by prepayment.
+		$prepayment = $this->getState('filter.prepayment');
+		if (is_array($prepayment) && !empty($prepayment))
+		{
+			$prepayment[] = 'all';
+			foreach ($prepayment as &$value)
+			{
+				$value = $db->quote($value);
+			}
+			$prepayment = implode(',', $prepayment);
+
+			if (!empty($prepayment))
+			{
+				$query->where($db->quoteName('i.prepayment') . ' IN (' . $prepayment . ')');
+			}
+
+		}
+
+		// Filter by author
+		$authorId = $this->getState('filter.author_id');
+		$onlymy   = $this->getState('filter.onlymy');
+		if (empty($authorId) && !empty($onlymy) && !$user->guest)
+		{
+			$authorId = $user->id;
+		}
+		if (is_numeric($authorId))
+		{
+			$query->where('i.created_by = ' . (int) $authorId);
+		}
+
+		// Filter by for_when.
+		$for_when = $this->getState('filter.for_when');
+		if (is_array($for_when))
+		{
+			$today = new Date(date('Y-m-d'));
+			foreach ($for_when as &$value)
+			{
+				$value = $db->quote($value);
+			}
+			$for_when = implode(',', $for_when);
+
+			if (!empty($for_when))
+			{
+				$query->where('(' . $db->quoteName('i.created') . ' >= ' . $db->quote($today->toSql()) .
+					' AND ' . $db->quoteName('i.for_when') . ' IN (' . $for_when . '))');
+			}
+		}
+
+		// Filter by published state.
+		$published = $this->getState('filter.published');
+		if (!empty($published))
+		{
+			$nullDate = $db->getNullDate();
+			$now      = Factory::getDate()->toSql();
+
+			if (is_numeric($published))
+			{
+				$query->where('( i.state = ' . (int) $published .
+					' OR ( i.created_by = ' . $user->id . ' AND i.state IN (0,1)))');
+				$query->where('(' . $db->quoteName('i.publish_down') . ' = ' . $db->Quote($nullDate) . ' OR '
+					. $db->quoteName('i.publish_down') . '  >= ' . $db->Quote($now)
+					. 'OR i.created_by = ' . $user->id . ')');
+			}
+			elseif (is_array($published))
+			{
+				$query->where('i.state IN (' . implode(',', $published) . ')');
+			}
+		}
+
+		// Filter by coordinates.
+		$coordinates = $this->getState('filter.coordinates');
+		if (!empty($coordinates))
+		{
+			$query->where('(i.latitude BETWEEN ' . $db->quote($coordinates['south']) . ' AND ' . $db->quote($coordinates['north']) . ')');
+			if (isset($coordinates['west']) && isset($coordinates['east']))
+			{
+				if ($coordinates['west'] > 0 && $coordinates['east'] > 0 && $coordinates['west'] < $coordinates['east'])
+				{
+					$query->where('(i.longitude BETWEEN ' . $db->quote($coordinates['west']) .
+						' AND ' . $db->quote($coordinates['east']) . ')');
+				}
+				if ($coordinates['west'] > 0 && $coordinates['east'] > 0 && $coordinates['west'] > $coordinates['east'])
+				{
+					$query->where('(i.longitude BETWEEN ' . $db->quote($coordinates['west']) . ' AND ' . $db->quote(180)
+						. ' OR i.longitude BETWEEN ' . $db->quote(-180) . ' AND ' . $db->quote(0)
+						. ' OR i.longitude BETWEEN ' . $db->quote(0) . ' AND ' . $db->quote($coordinates['east']) . ')');
+				}
+				if ($coordinates['west'] > 0 && $coordinates['east'] < 0 && $coordinates['west'] > $coordinates['east'])
+				{
+					$query->where('((i.longitude BETWEEN ' . $db->quote(-180) . ' AND ' . $db->quote($coordinates['east']) . ')' .
+						' OR (i.longitude BETWEEN ' . $db->quote($coordinates['west']) . ' AND ' . $db->quote(180) . '))');
+				}
+				if ($coordinates['west'] < 0 && $coordinates['east'] < 0 && $coordinates['west'] < $coordinates['east'])
+				{
+					$query->where('(i.longitude BETWEEN ' . $db->quote($coordinates['west']) . ' AND ' . $db->quote($coordinates['east']) . ')');
+				}
+				if ($coordinates['west'] < 0 && $coordinates['east'] > 0 && $coordinates['west'] < $coordinates['east'])
+				{
+					$query->where('((i.longitude BETWEEN ' . $db->quote($coordinates['west']) . ' AND ' . $db->quote(0) . ')' .
+						' OR (i.longitude BETWEEN ' . $db->quote(0) . ' AND ' . $db->quote($coordinates['east']) . '))');
 				}
 			}
 		}
 
-		return $this->_category[$pk];
-	}
-
-	/**
-	 * Get the parent of this category
-	 *
-	 * @param   integer $pk     The id of the type.
-	 * @param  integer  $parent The parent_id of the type.
-	 *
-	 * @return object
-	 *
-	 * @since  1.0.0
-	 */
-	public function &getParent($pk = null, $parent = null)
-	{
-		$pk = (!empty($pk)) ? $pk : (int) $this->getState('category.id');
-
-		if (!isset($this->_parent[$pk]))
+		// Filter by tag.
+		$tag = (int) $this->getState('tag.id');
+		if ($tag > 1)
 		{
-			$db = Factory::getDbo();
-			if (empty($parent))
-			{
-				$query = $db->getQuery(true)
-					->select('parent_id')
-					->from('#__board_categories')
-					->where('id = ' . (int) $pk);
-				$db->setQuery($query);
-				$parent = $db->loadResult();
-			}
-			try
-			{
-				if ($parent > 1)
-				{
-					$query = $db->getQuery(true)
-						->select(array('id', 'title', 'alias', 'parent_id'))
-						->from('#__board_categories')
-						->where('id = ' . (int) $parent);
-
-					$db->setQuery($query);
-					$item = $db->loadObject();
-
-					if ($item)
-					{
-
-						$item->listLink = Route::_(BoardHelperRoute::getListRoute($item->id));
-						$item->mapLink  = Route::_(BoardHelperRoute::getListRoute($item->id));
-
-						$this->_parent[$pk] = $item;
-					}
-					else
-					{
-						$this->_parent[$pk] = false;
-					}
-				}
-				elseif ($parent == 1)
-				{
-					$root            = new stdClass();
-					$root->id        = 1;
-					$root->alias     = 'root';
-					$root->title     = Text::_('COM_BOARD_CATEGORY_ROOT');
-					$root->parent_id = 0;
-
-					$this->_parent[$pk] = $root;
-				}
-				else
-				{
-					$this->_parent[$pk] = false;
-				}
-
-			}
-			catch (Exception $e)
-			{
-				if ($e->getCode() == 404)
-				{
-					JError::raiseError(404, $e->getMessage());
-				}
-				else
-				{
-					$this->setError($e);
-					$this->_parent[$pk] = false;
-				}
-			}
+			$query->join('LEFT', $db->quoteName('#__contentitem_tag_map', 'tagmap')
+				. ' ON ' . $db->quoteName('tagmap.content_item_id') . ' = ' . $db->quoteName('i.id')
+				. ' AND ' . $db->quoteName('tagmap.type_alias') . ' = ' . $db->quote('com_board.item'))
+				->where($db->quoteName('tagmap.tag_id') . ' = ' . $tag);
 		}
 
-		return $this->_parent[$pk];
-	}
 
-	/**
-	 * Method to get items model
-	 *
-	 * @param bool $reset Reset model
-	 *
-	 * @return bool|JModelLegacy
-	 *
-	 * @since  1.0.0
-	 */
-	protected function getItemsModel($reset = false)
-	{
-		if ($this->_itemsModel == null || $reset)
+		// Filter by search.
+		$search = $this->getState('filter.search');
+		if (!empty($search))
 		{
-			$model = BaseDatabaseModel::getInstance('Items', 'BoardModel', array('ignore_request' => true));
-			$model->setState('params', $this->getState('params'));
-			$model->setState('map', false);
-			$model->setState('filter.category', $this->getState('category.id', 1));
-			if ((!Factory::getUser()->authorise('core.edit.state', 'com_board.item')) &&
-				(!Factory::getUser()->authorise('core.edit', 'com_board.item')))
+			$cols = array('i.title', 'r.name', 'i.text', 'i.tags_search', 'i.extra');
+			$sql  = array();
+			foreach ($cols as $col)
 			{
-				$model->setState('filter.published', 1);
+				$sql[] = $db->quoteName($col) . ' LIKE '
+					. $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
 			}
-			else
-			{
-				$model->setState('filter.published', array(0, 1));
-			}
-			$model->setState('filter.search', $this->getState('filter.search'));
-			$model->setState('filter.price', $this->getState('filter.price'));
-			$model->setState('filter.payment_method', $this->getState('filter.payment_method'));
-			$model->setState('filter.prepayment', $this->getState('filter.prepayment'));
-			$model->setState('filter.allregions', $this->getState('filter.allregions'));
-			$model->setState('filter.onlymy', $this->getState('filter.onlymy'));
-			$model->setState('filter.author_id', $this->getState('filter.author_id'));
-			$model->setState('filter.for_when', $this->getState('filter.for_when'));
-
-			// Set limit & limitstart for query.
-			$model->setState('list.limit', $this->getState('list.limit'));
-			$model->setState('list.start', $this->getState('list.start'));
-
-			$this->_itemsModel = $model;
+			$query->where('(' . implode(' OR ', $sql) . ')');
 		}
 
-		return $this->_itemsModel;
+		// Group by
+		$query->group(array('i.id'));
+
+		// Add the list ordering clause.
+		$ordering  = $this->state->get('list.ordering', 'i.created');
+		$direction = $this->state->get('list.direction', 'desc');
+		$query->order($db->escape($ordering) . ' ' . $db->escape($direction));
+
+		return $query;
 	}
 
 	/**
-	 * Get the articles in the category
+	 * Method to get an array of data items.
 	 *
-	 * @return  mixed  An array of articles or false if an error occurs.
+	 * @return  mixed  An array of data items on success, false on failure.
 	 *
-	 * @since  1.0.0
+	 * @since  1.1.0
 	 */
 	public function getItems()
 	{
-		if ($this->_items === null)
+		$items = parent::getItems();
+		if (!empty($items))
 		{
-			$model        = $this->getItemsModel();
-			$this->_items = $model->getItems();
+			$today    = new Date(date('Y-m-d'));
+			$user     = Factory::getUser();
+			$mainTags = ComponentHelper::getParams('com_board')->get('tags', array());
 
-			if ($this->_items === false)
+			foreach ($items as &$item)
 			{
-				$this->setError($model->getError());
-			}
+				$item->for_when = ($item->created >= $today->toSql()) ? $item->for_when : '';
 
-			$this->_pagination = $model->getPagination();
+				$item->link     = Route::_(BoardHelperRoute::getItemRoute($item->id));
+				$item->editLink = false;
+				if (!$user->guest)
+				{
+					$userId = $user->id;
+					$asset  = 'com_board.item.' . $item->id;
+
+					$editLink = Route::_(BoardHelperRoute::getFormRoute($item->id));
+
+					// Check general edit permission first.
+					if ($user->authorise('core.edit', $asset))
+					{
+						$item->editLink = $editLink;
+					}
+					// Now check if edit.own is available.
+					elseif (!empty($userId) && $user->authorise('core.edit.own', $asset))
+					{
+						// Check for a valid user and that they are the owner.
+						if ($userId == $item->created_by)
+						{
+							$item->editLink = $editLink;
+						}
+					}
+				}
+
+				// Convert the contacts field from json.
+				$item->contacts = new Registry($item->contacts);
+				if ($phones = $item->contacts->get('phones'))
+				{
+					$phones = ArrayHelper::fromObject($phones, false);
+					$item->contacts->set('phones', $phones);
+				}
+
+				// Convert the map field from json.
+				$item->map = (!empty($item->latitude) && !empty($item->longitude) &&
+					$item->latitude !== '0.000000' && $item->longitude !== '0.000000') ? new Registry($item->map) : false;
+
+				// Convert the images field to an array.
+				$registry     = new Registry($item->images);
+				$item->images = $registry->toArray();
+				$item->image  = (!empty($item->images) && !empty(reset($item->images)['src'])) ?
+					reset($item->images)['src'] : false;
+
+				// Prepare author data
+				$author_avatar         = (!empty($item->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $item->author_avatar)) ?
+					$item->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
+				$item->author_avatar   = Uri::root(true) . '/' . $author_avatar;
+				$item->author_link     = Route::_(ProfilesHelperRoute::getProfileRoute($item->author_id));
+				$item->author_job_logo = (!empty($item->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $item->author_job_logo)) ?
+					Uri::root(true) . '/' . $item->author_job_logo : false;
+				$item->author_job_link = Route::_(CompaniesHelperRoute::getCompanyRoute($item->author_job_id));
+
+				// Get Tags
+				$item->tags = new TagsHelper;
+				$item->tags->getItemTags('com_board.item', $item->id);
+				if (!empty($item->tags->itemTags))
+				{
+					foreach ($item->tags->itemTags as &$tag)
+					{
+						$tag->main = (in_array($tag->id, $mainTags));
+					}
+					$item->tags->itemTags = ArrayHelper::sortObjects($item->tags->itemTags, 'main', -1);
+				}
+
+
+				// Get placemark
+				$item->placemark = ($item->map) ? $item->map->get('placemark') : false;
+				if ($item->placemark)
+				{
+					$html = LayoutHelper::render('components.com_board.placemark', $item);
+					preg_match('/data-placemark-coordinates="([^"]*)"/', $html, $matches);
+					$coordinates = '[]';
+					if (!empty($matches[1]))
+					{
+						$coordinates = $matches[1];
+						$html        = str_replace($matches[0], '', $html);
+					}
+
+					$iconShape              = new stdClass();
+					$iconShape->type        = 'Polygon';
+					$iconShape->coordinates = json_decode($coordinates);
+
+					$item->placemark->id                      = $item->id;
+					$item->placemark->link                    = $item->link;
+					$item->placemark->options                 = array();
+					$item->placemark->options['customLayout'] = $html;
+					$item->placemark->options['iconShape']    = $iconShape;
+					$item->map->set('placemark', $item->placemark);
+				}
+
+			}
 		}
 
-		return $this->_items;
+		return $items;
 	}
 
 	/**
-	 * Method to get a \JPagination object for the data set.
+	 * Gets an array of objects from the results of database query.
 	 *
-	 * @return  \JPagination  A \JPagination object for the data set.
+	 * @param   string  $query      The query.
+	 * @param   integer $limitstart Offset.
+	 * @param   integer $limit      The number of records.
 	 *
-	 * @since  1.0.0
+	 * @return  object[]  An array of results.
+	 *
+	 * @since  1.1.0
+	 * @throws  \RuntimeException
 	 */
-	public function getPagination()
+	protected function _getList($query, $limitstart = 0, $limit = 0)
 	{
-		if ($this->_pagination === null)
-		{
-			$model             = $this->getItemsModel();
-			$this->_pagination = $model->getPagination();
+		$this->getDbo()->setQuery($query, $limitstart, $limit);
 
-			if ($this->_pagination === false)
+		return $this->getDbo()->loadObjectList('id');
+	}
+
+	/**
+	 * Get the current tag
+	 *
+	 * @param null $pk
+	 *
+	 * @return object|false
+	 *
+	 * @since 1.1.0
+	 */
+	public function getTag($pk = null)
+	{
+		if (!is_object($this->_tag))
+		{
+			$app    = Factory::getApplication();
+			$pk     = (!empty($pk)) ? (int) $pk : (int) $this->getState('tag.id', $app->input->get('id', 1));
+			$tag_id = $pk;
+
+			$root            = new stdClass();
+			$root->title     = Text::_('JGLOBAL_ROOT');
+			$root->id        = 1;
+			$root->parent_id = 0;
+			$root->link      = Route::_(BoardHelperRoute::getListRoute(1));
+
+			if ($tag_id > 1)
 			{
-				$this->setError($model->getError());
+				$errorRedirect = Route::_(BoardHelperRoute::getListRoute(1));
+				$errorMsg      = Text::_('COM_BOARD_ERROR_TAG_NOT_FOUND');
+				try
+				{
+					$db    = $this->getDbo();
+					$query = $db->getQuery(true)
+						->select(array('t.id', 't.parent_id', 't.title', 'pt.title as parent_title'))
+						->from('#__tags AS t')
+						->where('t.id = ' . (int) $tag_id)
+						->join('LEFT', '#__tags AS pt ON pt.id = t.parent_id');
+
+					$user = Factory::getUser();
+					if (!$user->authorise('core.admin'))
+					{
+						$query->where('t.access IN (' . implode(',', $user->getAuthorisedViewLevels()) . ')');
+					}
+					if (!$user->authorise('core.manage', 'com_tags'))
+					{
+						$query->where('t.published =  1');
+					}
+
+					$db->setQuery($query);
+					$data = $db->loadObject();
+
+					if (empty($data))
+					{
+						$app->redirect($url = $errorRedirect, $msg = $errorMsg, $msgType = 'error', $moved = true);
+
+						return false;
+					}
+
+					$data->link = Route::_(BoardHelperRoute::getListRoute($data->id));
+
+					$this->_tag = $data;
+				}
+				catch (Exception $e)
+				{
+					if ($e->getCode() == 404)
+					{
+						$app->redirect($url = $errorRedirect, $msg = $errorMsg, $msgType = 'error', $moved = true);
+					}
+					else
+					{
+						$this->setError($e);
+						$this->_tag = false;
+					}
+				}
+			}
+			else
+			{
+				$this->_tag = $root;
 			}
 		}
 
-		return $this->_pagination;
+		return $this->_tag;
 	}
 
 	/**

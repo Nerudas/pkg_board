@@ -47,9 +47,9 @@
 			<folder>tables</folder>
 			<folder>views</folder>
 			<filename>access.xml</filename>
+			<filename>board.php</filename>
 			<filename>config.xml</filename>
 			<filename>controller.php</filename>
-			<filename>board.php</filename>
 		</files>
 		<languages folder="admin">
 			<language tag="en-GB">language/en-GB/en-GB.com_board.ini</language>
