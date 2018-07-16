@@ -45,14 +45,6 @@ class BoardViewForm extends HtmlView
 	 */
 	protected $state;
 
-	/**
-	 * The categories array
-	 *
-	 * @var  array
-	 *
-	 * @since  1.0.0
-	 */
-	protected $categories;
 
 	/**
 	 * The actions the user is authorised to perform
@@ -104,32 +96,25 @@ class BoardViewForm extends HtmlView
 			strpos($active->link, '&id=' . (string) $this->state->get('item.id'))
 		) ? $active->query['layout'] : $params->get('form_layout', 'default');
 
-		if ($params->get('show_categories', 1) && empty($this->state->get('item.id'))
-			&& $this->state->get('category.default', 1) <= 1)
+
+		// Check actions
+		$authorised = (empty($this->item->id)) ? $user->authorise('core.create', 'com_board') :
+			$user->authorise('core.edit', 'com_board.item.' . $this->item->id) ||
+			($user->authorise('core.edit.own', 'com_board.item.' . $this->item->id)
+				&& $this->item->created_by == $user->id);
+
+		if (!$authorised && $user->guest)
 		{
-			$layout .= '_categories';
+			$login = Route::_('index.php?option=com_users&view=login&return=' . base64_encode(Uri::getInstance()));
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'notice');
+			$app->redirect($login, 403);
 		}
-		else
+		elseif (!$authorised)
 		{
-			// Check actions
-			$authorised = (empty($this->item->id)) ? $user->authorise('core.create', 'com_board') :
-				$user->authorise('core.edit', 'com_board.item.' . $this->item->id) ||
-				($user->authorise('core.edit.own', 'com_board.item.' . $this->item->id)
-					&& $this->item->created_by == $user->id);
+			$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$app->setHeader('status', 403, true);
 
-			if (!$authorised && $user->guest)
-			{
-				$login = Route::_('index.php?option=com_users&view=login&return=' . base64_encode(Uri::getInstance()));
-				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'notice');
-				$app->redirect($login, 403);
-			}
-			elseif (!$authorised)
-			{
-				$app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
-				$app->setHeader('status', 403, true);
-
-				return false;
-			}
+			return false;
 		}
 
 		$this->setLayout($layout);
@@ -164,22 +149,5 @@ class BoardViewForm extends HtmlView
 
 		$this->document->setTitle($title);
 		$this->document->setMetadata('robots', 'noindex');
-	}
-
-	/**
-	 * Returns the categories array
-	 *
-	 * @return  mixed  array
-	 *
-	 * @since  1.0.0
-	 */
-	public function getCategories()
-	{
-		if (!is_array($this->categories))
-		{
-			$this->categories = $this->get('Categories');
-		}
-
-		return $this->categories;
 	}
 }
