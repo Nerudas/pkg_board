@@ -19,3 +19,6 @@ Module for displaying the latest Bulletin board items
 
 * **Bulletin Board - Administrator Module**  
 Module for displaying information about board items in the admin panel
+
+* **Bulletin Board - Tags Module**  
+Module for displaying companies tags
