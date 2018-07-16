@@ -37,13 +37,11 @@
 	</languages>
 	<administration>
 		<menu>COM_BOARD</menu>
-		<submenu>
-			<menu option="com_board" view="items">COM_BOARD_ITEMS</menu>
-		</submenu>
 		<files folder="admin">
 			<folder>controllers</folder>
 			<folder>helpers</folder>
 			<folder>models</folder>
+			<folder>layouts</folder>
 			<folder>sql</folder>
 			<folder>tables</folder>
 			<folder>tables</folder>
@@ -62,5 +60,6 @@
 	</administration>
 	<media destination="com_board" folder="media">
 		<folder>css</folder>
+		<folder>images</folder>
 	</media>
 </extension>

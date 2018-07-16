@@ -53,3 +53,7 @@
 	margin-right: 3px;
 	margin-bottom: 3px;
 }
+
+#system-message-container {
+	width: 100%;
+}

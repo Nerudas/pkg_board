@@ -59,8 +59,8 @@ $doc->addScriptDeclaration('
 		<?php echo HTMLHelper::_('bootstrap.endTab'); ?>
 
 		<?php
-		echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'categories', Text::_('COM_BOARD_ITEM_CATEGORIES'));
-		echo LayoutHelper::render('components.com_board.form.categories', $this);
+		echo HTMLHelper::_('bootstrap.addTab', 'myTab', 'tags', Text::_('JTAG'));
+		echo $this->form->getInput('tags');
 		echo HTMLHelper::_('bootstrap.endTab');
 		?>
 

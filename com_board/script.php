@@ -28,7 +28,7 @@ class com_BoardInstallerScript
 		$this->fixTables($path);
 		$this->tagsIntegration();
 		$this->createImageFolders();
-
+		$this->moveLayouts($path);
 		return true;
 	}
 
@@ -159,6 +159,35 @@ class com_BoardInstallerScript
 
 		// Remove images
 		JFolder::delete(JPATH_ROOT . '/images/board');
+
+		// Remove layouts
+		JFolder::delete(JPATH_ROOT . '/layouts/components/com_board');
+	}
+
+	/**
+	 * Move layouts folder
+	 *
+	 * @param string $path path to files
+	 *
+	 * @since  1.0.0
+	 */
+	protected function moveLayouts($path)
+	{
+		$component = JPATH_ADMINISTRATOR . $path . '/layouts';
+		$layouts   = JPATH_ROOT . '/layouts' . $path;
+
+		if (!JFolder::exists(JPATH_ROOT . '/layouts/components'))
+		{
+			JFolder::create(JPATH_ROOT . '/layouts/components');
+		}
+
+		if (JFolder::exists($layouts))
+		{
+			JFolder::delete($layouts);
+		}
+
+		JFolder::move($component, $layouts);
+
 	}
 
 	/**
@@ -234,7 +263,6 @@ class com_BoardInstallerScript
 		$folders = array(
 			'/administrator/components/com_board/views/categories',
 			'/administrator/components/com_board/views/category',
-			'/layouts/components/com_board',
 			'/components/com_board/views/map',
 			'/images/board/categories',
 			'/media/com_board/js',

@@ -12,10 +12,11 @@
 			<option value="">JOPTION_SELECT_ACCESS</option>
 		</field>
 		<field name="created_by" type="user"/>
-		<field name="category" type="boardcategory" onchange="this.form.submit();" default="">
-			<option value="">JOPTION_SELECT_CATEGORY</option>
-			<option value="without">COM_BOARD_CATEGORY_WITHOUT</option>
-		</field>
+		<field name="tags" type="advtags"
+			   layout="joomla.form.field.advtags.select"
+			   multiple="true"
+			   class="multipleTags"
+			   onchange="this.form.submit();"/>
 		<field name="region" type="regions" show_null="true" onchange="this.form.submit();"/>
 	</fields>
 

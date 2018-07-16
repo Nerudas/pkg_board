@@ -19,19 +19,10 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 class BoardModelItem extends AdminModel
 {
-
-	/**
-	 * Categories
-	 *
-	 * @var    array
-	 *
-	 * @since  1.0.0
-	 */
-	protected $_categories = null;
-
 	/**
 	 * Profile contacts
 	 *
@@ -65,29 +56,6 @@ class BoardModelItem extends AdminModel
 		$this->imageFolderHelper = new imageFolderHelper('images/board/items');
 
 		parent::__construct($config);
-	}
-
-	/**
-	 * Method to auto-populate the model state.
-	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 *
-	 * @return  void
-	 *
-	 * @since  1.0.0
-	 */
-	protected function populateState()
-	{
-		$app = Factory::getApplication();
-		$pk  = $app->input->getInt('id', 0);
-		if (empty($pk))
-		{
-			$default_category = $app->input->getInt('category', 1);
-			$this->setState('category.default', $default_category);
-		}
-
-		parent::populateState();
 	}
 
 	/**
@@ -131,75 +99,6 @@ class BoardModelItem extends AdminModel
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Method to get categories array
-	 *
-	 *
-	 * @return  mixed  Object on success, false on failure.
-	 *
-	 * @since  1.0.0
-	 */
-	public function getCategories()
-	{
-		if (!is_array($this->_categories))
-		{
-			$access = Factory::getUser()->getAuthorisedViewLevels();
-
-			$db    = $this->getDbo();
-			$query = $db->getQuery(true)
-				->select(array('c.id', 'c.title', 'c.icon', 'parent_id', 'level'))
-				->from($db->quoteName('#__board_categories', 'c'))
-				->where($db->quoteName('c.alias') . ' <> ' . $db->quote('root'))
-				->order('c.lft ASC')
-				->where('c.state =  1')
-				->where('c.access IN (' . implode(',', $access) . ')');;
-			$db->setQuery($query);
-			$categories = $db->loadObjectList('id');
-
-			$item             = $this->getItem();
-			$itemTags         = (!empty($item->tags->tags)) ? explode(',', $item->tags->tags) : array();
-			$default_category = $this->getState('category.default', 1);
-
-
-			foreach ($categories as &$category)
-			{
-				// Get Tags
-				$tags = new TagsHelper;
-				$tags->getTagIds($category->id, 'com_board.category');
-				$category->tags = (!empty($tags->tags)) ? explode(',', $tags->tags) : array();
-
-				// Set active
-				$category->active = (!empty($itemTags) && !empty($category->tags));
-				if ($category->active)
-				{
-					foreach ($category->tags as $tag)
-					{
-						if (!in_array($tag, $itemTags))
-						{
-							$category->active = false;
-						}
-						if (!$category->active)
-						{
-							break;
-						}
-					}
-				}
-
-				if (!$category->active && $default_category == $category->id && empty($item->id))
-				{
-					$category->active = true;
-				}
-
-				$category->active_full = ($category->active &&
-					(empty($item->id) && $default_category == $category->id) || count($category->tags) == count($itemTags));
-			}
-
-			$this->_categories = $categories;
-		}
-
-		return $this->_categories;
 	}
 
 	/**
@@ -263,36 +162,11 @@ class BoardModelItem extends AdminModel
 		$form->setFieldAttribute('map', 'placemarkurl',
 			Uri::base(true) . '/index.php?option=com_board&task=item.getPlacemark&id=' . $id);
 
-		// Set tags
-		if (!$form->getFieldAttribute('tags', 'ids'))
+		// Set Tags parents
+		$config = ComponentHelper::getParams('com_board');
+		if ($config->get('item_tags'))
 		{
-			$categories = $this->getCategories();
-			$tags       = array();
-			$actives    = array();
-			foreach ($categories as $category)
-			{
-				if (!empty($category->tags))
-				{
-					foreach ($category->tags as $tag)
-					{
-						if ($category->active)
-						{
-							$actives[] = $tag;
-						}
-						$tags[] = $tag;
-					}
-				}
-			}
-			$tags = implode(',', array_unique($tags));
-			$form->setFieldAttribute('tags', 'ids', $tags);
-			$value = $form->getValue('tags');
-			if (!empty($actives) && is_object($value) && empty($value->tags) && empty($id) && $this->getState('category.default', 1) > 1)
-			{
-
-				$value->tags = implode(',', array_unique($actives));
-				$form->setValue('tags', '', $value);
-
-			}
+			$form->setFieldAttribute('tags', 'parents', implode(',', $config->get('item_tags')));
 		}
 
 		return $form;

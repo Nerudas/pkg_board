@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Response\JsonResponse;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardControllerItem extends FormController
@@ -88,15 +87,21 @@ class BoardControllerItem extends FormController
 		$app  = Factory::getApplication();
 		$data = $this->input->post->get('jform', array(), 'array');
 
-		$options                 = array();
-		$options['customLayout'] = LayoutHelper::render('components.com_board.map.placemark', $data);
+		$html = LayoutHelper::render('components.com_board.placemark', $data);
+		preg_match('/data-placemark-coordinates="([^"]*)"/', $html, $matches);
+		$coordinates = '[]';
+		if (!empty($matches[1]))
+		{
+			$coordinates = $matches[1];
+			$html        = str_replace($matches[0], '', $html);
+		}
 
-		$iconShape              = new stdClass();
-		$iconShape->type        = 'Polygon';
-		$iconShape->coordinates = json_decode(ComponentHelper::getParams('com_board')
-			->get('placemark_coordinates',
-				'[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]'));
-		$options['iconShape']   = $iconShape;
+		$options                 = array();
+		$options['customLayout'] = $html;
+		$iconShape               = new stdClass();
+		$iconShape->type         = 'Polygon';
+		$iconShape->coordinates  = json_decode($coordinates);
+		$options['iconShape']    = $iconShape;
 
 		echo new JsonResponse($options);
 		$app->close();

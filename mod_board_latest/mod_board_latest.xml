@@ -22,12 +22,11 @@
 	<config>
 		<fields name="params" addfieldpath="/administrator/components/com_board/models/fields">
 			<fieldset name="basic">
-				<field name="category" type="boardcategory"
-					   label="MOD_BOARD_LATEST_PARAMS_CATEGORY"
+				<field name="tag_id" type="boardtags"
+					   label="JTAG"
 					   default="1"
-					   required="true">
-					<option value="1">JGLOBAL_ROOT</option>
-				</field>
+					   required="true"
+					   addfieldpath="/administrator/components/com_board/models/fields"/>
 				<field name="limit" type="number" label="MOD_BOARD_LATEST_PARAMS_LIMIT" default="5"/>
 				<field name="allregions" type="radio"
 					   default="0"

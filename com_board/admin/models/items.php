@@ -16,16 +16,10 @@ use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Utilities\ArrayHelper;
 
 class BoardModelItems extends ListModel
 {
-	/**
-	 * Category tags
-	 *
-	 * @var    array
-	 * @since  1.0.0
-	 */
-	protected $_categoryTags = array();
 
 	/**
 	 * Constructor.
@@ -92,8 +86,8 @@ class BoardModelItems extends ListModel
 		$region = $this->getUserStateFromRequest($this->context . '.filter.region', 'filter_region', '');
 		$this->setState('filter.region', $region);
 
-		$category = $this->getUserStateFromRequest($this->context . '.filter.category', 'filter_category', '');
-		$this->setState('filter.category', $category);
+		$tags = $this->getUserStateFromRequest($this->context . '.filter.tags', 'filter_tags', '');
+		$this->setState('filter.tags', $tags);
 
 		// List state information.
 		$ordering  = empty($ordering) ? 'i.created' : $ordering;
@@ -121,7 +115,7 @@ class BoardModelItems extends ListModel
 		$id .= ':' . $this->getState('filter.published');
 		$id .= ':' . $this->getState('filter.created_by');
 		$id .= ':' . $this->getState('filter.region');
-		$id .= ':' . $this->getState('filter.category');
+		$id .= ':' . serialize($this->getState('filter.tags'));
 
 		return parent::getStoreId($id);
 	}
@@ -211,35 +205,21 @@ class BoardModelItems extends ListModel
 			$query->where('i.created_by = ' . (int) $created_by);
 		}
 
-		// Filter by category
-		$category = $this->getState('filter.category');
-		if ($category > 1 || $category == 'without')
+		// Filter by tags.
+		$tags = $this->getState('filter.tags');
+		if (is_array($tags))
 		{
-			$categoryTags = $this->getCategoryTags($category);
-
-			$sql = array();
-			foreach ($categoryTags as $tags)
+			$tags = ArrayHelper::toInteger($tags);
+			$tags = implode(',', $tags);
+			if (!empty($tags))
 			{
-				if (!empty($tags))
-				{
-					$categorySql = array();
-					$operator    = ($category != 'without') ? ' LIKE ' : ' NOT LIKE ';
-					foreach ($tags as $tag)
-					{
-
-						$categorySql[] = $db->quoteName('i.tags_map') . $operator . $db->quote('%[' . $tag . ']%');
-					}
-				}
-				$operator = ($category != 'without') ? ' AND ' : ' OR ';
-				$sql[]    = '(' . implode($operator, $categorySql) . ')';
-			}
-
-			if (!empty($sql))
-			{
-				$operator = ($category != 'without') ? ' OR ' : ' AND ';
-				$query->where('(' . implode($operator, $sql) . ')');
+				$query->join('LEFT', $db->quoteName('#__contentitem_tag_map', 'tagmap')
+					. ' ON ' . $db->quoteName('tagmap.content_item_id') . ' = ' . $db->quoteName('i.id')
+					. ' AND ' . $db->quoteName('tagmap.type_alias') . ' = ' . $db->quote('com_board.item'))
+					->where($db->quoteName('tagmap.tag_id') . ' IN (' . $tags . ')');
 			}
 		}
+
 
 		// Filter by search.
 		$search = $this->getState('filter.search');
@@ -283,9 +263,10 @@ class BoardModelItems extends ListModel
 	public function getItems()
 	{
 		$items = parent::getItems();
-		$today = new Date(date('Y-m-d'));
 		if (!empty($items))
 		{
+			$today    = new Date(date('Y-m-d'));
+			$mainTags = ComponentHelper::getParams('com_board')->get('tags', array());
 			foreach ($items as &$item)
 			{
 				$item->for_when = ($item->created >= $today->toSql()) ? $item->for_when : '';
@@ -300,60 +281,17 @@ class BoardModelItems extends ListModel
 				// Get Tags
 				$item->tags = new TagsHelper;
 				$item->tags->getItemTags('com_board.item', $item->id);
+				if (!empty($item->tags->itemTags))
+				{
+					foreach ($item->tags->itemTags as &$tag)
+					{
+						$tag->main = (in_array($tag->id, $mainTags));
+					}
+					$item->tags->itemTags = ArrayHelper::sortObjects($item->tags->itemTags, 'main', -1);
+				}
 			}
 		}
 
 		return $items;
 	}
-
-	/**
-	 * Method to get an array of category tags.
-	 *
-	 * @param int $pk category id
-	 *
-	 * @return  mixed  An array of data items on success, false on failure.
-	 *
-	 * @since  1.0.0
-	 */
-	public function getCategoryTags($pk = null)
-	{
-		$pk = (!empty($pk)) ? $pk : $this->getState('filter.category');
-		if (!isset($this->_categoryTags[$pk]))
-		{
-			try
-			{
-				$tags = array();
-				if (!empty($pk))
-				{
-					$db    = Factory::getDbo();
-					$query = $db->getQuery(true)
-						->select(array('c.id', 'c.items_tags'))
-						->from($db->quoteName('#__board_categories', 'c'))
-						->where($db->quoteName('c.alias') . ' <> ' . $db->quote('root'));
-					if ($pk != 'without')
-					{
-						$query->join('LEFT', '#__board_categories as this ON c.lft > this.lft AND c.rgt < this.rgt')
-							->where('(this.id = ' . (int) $pk . ' OR c.id = ' . $pk . ')');
-					};
-					$db->setQuery($query);
-					$categories = $db->loadObjectList();
-
-					foreach ($categories as $category)
-					{
-						$tags[$category->id] = array_unique(explode(',', $category->items_tags));
-					}
-
-				}
-				$this->_categoryTags[$pk] = $tags;
-			}
-			catch (Exception $e)
-			{
-				$this->setError($e);
-				$this->_categoryTags[$pk] = false;
-			}
-		}
-
-		return $this->_categoryTags[$pk];
-	}
-
 }

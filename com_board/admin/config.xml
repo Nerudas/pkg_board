@@ -2,6 +2,12 @@
 <config>
 	<fieldset name="global" label="JGLOBAL_FIELDSET_OPTIONS">
 		<field name="sef_advanced" type="hidden" default="1"/>
+		<field name="item_tags" type="sql"
+			   label="COM_BOARD_PARAMS_ITEM_TAGS"
+			   query="SELECT id, title FROM #__tags WHERE level = 1"
+			   key_field="id"
+			   value_field="title"
+			   multiple="true"/>
 		<field name="items_limit" type="list"
 			   label="COM_BOARD_PARAMS_ITEMS_LIMIT"
 			   default="10">
@@ -31,47 +37,13 @@
 			   label="COM_BOARD_PARAMS_FORM_LAYOUT"
 			   extension="com_board"
 			   view="form"/>
-		<field name="map_layout" type="componentlayout"
-			   label="COM_BOARD_PARAMS_MAP_LAYOUT"
-			   extension="com_board"
-			   view="map"/>
-
-		<field type="note" label="COM_BOARD_PARAMS_PLACEMARK"/>
-		<field name="placemark_coordinates" type="text"
-			   label="COM_BOARD_PARAMS_PLACEMARK_COORDINATES"
-			   class="input-xxlarge"
-			   default="[[[-24, -48],[300, -48],[24, -8],[24, -8],[0, 0],[-24, -10],[-24, -10]]]"/>
-
-		<field type="note" label="COM_BOARD_PARAMS_CLUSTER"/>
-		<fields name="cluster">
-			<field name="gridSize" type="number"
-				   label="COM_BOARD_PARAMS_CLUSTER_GRIDSIZE"
-				   default="120"/>
-			<field name="minClusterSize" type="number"
-				   label="COM_BOARD_PARAMS_CLUSTER_MINCLUSTERSIZE"
-				   default="2"/>
-			<fields name="icon">
-				<field name="href" type="media"
-					   label="COM_BOARD_PARAMS_CLUSTER_ICON"
-					   class="input-large"
-					   default="media/com_board/images/cluster.png"/>
-				<field name="size" type="text"
-					   label="COM_BOARD_PARAMS_CLUSTER_ICON_SIZE"
-					   default="[64,64]"/>
-				<field name="offset" type="text"
-					   label="COM_BOARD_PARAMS_CLUSTER_ICON_OFFSET"
-					   default="[-32,-32]"/>
-			</fields>
-			<field name="numberColor" type="color"
-				   label="COM_BOARD_PARAMS_CLUSTER_NUMBERCOLOR"
-				   default="#ffffff"/>
-			<field name="clickOpacity" type="text"
-				   label="COM_BOARD_PARAMS_CLUSTER_CLICKOPACITY"
-				   class="input-xsmall"
-				   default="0.75"/>
-		</fields>
 	</fieldset>
-
+	<fieldset name="navigation" label="COM_BOARD_PARAMS_NAVIGATION">
+		<field name="root_title" label="COM_BOARD_PARAMS_ROOT_TITLE" default="COM_BOARD"/>
+		<field name="tags" type="advtags"
+			   label="JTAG"
+			   multiple="true"/>
+	</fieldset>
 	<fieldset name="permissions"
 			  label="JCONFIG_PERMISSIONS_LABEL"
 			  description="JCONFIG_PERMISSIONS_DESC">
