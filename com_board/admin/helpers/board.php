@@ -29,11 +29,5 @@ class BoardHelper extends ContentHelper
 		JHtmlSidebar::addEntry(Text::_('COM_BOARD_ITEMS'),
 			'index.php?option=com_board&view=items',
 			$vName == 'items');
-
-		JHtmlSidebar::addEntry(
-			Text::_('COM_BOARD_CATEGORIES'),
-			'index.php?option=com_board&view=categories',
-			$vName == 'categories'
-		);
 	}
 }

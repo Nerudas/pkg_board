@@ -10,13 +10,13 @@
 	<authorUrl>nerudas.ru</authorUrl>
 	<version>1.1.0</version>
 	<description>PKG_BOARD_DESCRIPTION</description>
+	<scriptfile>script.php</scriptfile>
 	<languages folder="language">
 		<language tag="en-GB">en-GB/en-GB.pkg_board.sys.ini</language>
 		<language tag="ru-RU">ru-RU/ru-RU.pkg_board.sys.ini</language>
 	</languages>
 	<files>
 		<folder type="component" id="com_board">com_board</folder>
-		<folder type="module" id="mod_board_categories" client="site">mod_board_categories</folder>
 		<folder type="module" id="mod_board_latest" client="site">mod_board_latest</folder>
 		<folder type="module" id="mod_board_admin" client="administrator">mod_board_admin</folder>
 	</files>

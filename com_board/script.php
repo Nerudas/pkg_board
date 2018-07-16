@@ -27,43 +27,9 @@ class com_BoardInstallerScript
 		$path = '/components/com_board';
 		$this->fixTables($path);
 		$this->tagsIntegration();
-		$this->moveLayouts($path);
 		$this->createImageFolders();
-		$this->createRootCategory();
 
 		return true;
-	}
-
-	/**
-	 * Create root category
-	 *
-	 * @since  1.0.0
-	 */
-	protected function createRootCategory()
-	{
-		$db = Factory::getDbo();
-
-		// Category
-		$query = $db->getQuery(true)
-			->select('id')
-			->from($db->quoteName('#__board_categories'))
-			->where($db->quoteName('id') . ' = ' . $db->quote(1));
-		$db->setQuery($query);
-		$current_id = $db->loadResult();
-
-		$root            = new stdClass();
-		$root->id        = 1;
-		$root->parent_id = 0;
-		$root->lft       = 0;
-		$root->rgt       = 1;
-		$root->level     = 0;
-		$root->path      = '';
-		$root->alias     = 'root';
-		$root->access    = 1;
-		$root->state     = 1;
-
-		(!empty($current_id)) ? $db->updateObject('#__board_categories', $root, 'id')
-			: $db->insertObject('#__board_categories', $root);
 	}
 
 	/**
@@ -76,7 +42,6 @@ class com_BoardInstallerScript
 		$folders = array(
 			'images/board',
 			'images/board/items',
-			'images/board/categories',
 		);
 
 
@@ -98,70 +63,8 @@ class com_BoardInstallerScript
 	 */
 	protected function tagsIntegration()
 	{
-		$db = Factory::getDbo();
-
-		// Category
-		$query = $db->getQuery(true)
-			->select('type_id')
-			->from($db->quoteName('#__content_types'))
-			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.category'));
-		$db->setQuery($query);
-		$current_id = $db->loadResult();
-
-		$category                                               = new stdClass();
-		$category->type_id                                      = (!empty($current_id)) ? $current_id : '';
-		$category->type_title                                   = 'Board Category';
-		$category->type_alias                                   = 'com_board.category';
-		$category->table                                        = new stdClass();
-		$category->table->special                               = new stdClass();
-		$category->table->special->dbtable                      = '#__board_categories';
-		$category->table->special->key                          = 'id';
-		$category->table->special->type                         = 'Categories';
-		$category->table->special->prefix                       = 'BoardTable';
-		$category->table->special->config                       = 'array()';
-		$category->table->common                                = new stdClass();
-		$category->table->common->dbtable                       = '#__ucm_content';
-		$category->table->common->key                           = 'ucm_id';
-		$category->table->common->type                          = 'Corecontent';
-		$category->table->common->prefix                        = 'JTable';
-		$category->table->common->config                        = 'array()';
-		$category->table                                        = json_encode($category->table);
-		$category->rules                                        = '';
-		$category->field_mappings                               = new stdClass();
-		$category->field_mappings->common                       = new stdClass();
-		$category->field_mappings->common->core_content_item_id = 'id';
-		$category->field_mappings->common->core_title           = 'title';
-		$category->field_mappings->common->core_state           = 'state';
-		$category->field_mappings->common->core_alias           = 'alias';
-		$category->field_mappings->common->core_created_time    = 'null';
-		$category->field_mappings->common->core_modified_time   = 'null';
-		$category->field_mappings->common->core_body            = 'null';
-		$category->field_mappings->common->core_hits            = 'null';
-		$category->field_mappings->common->core_publish_up      = 'null';
-		$category->field_mappings->common->core_publish_down    = 'null';
-		$category->field_mappings->common->core_access          = 'access';
-		$category->field_mappings->common->core_params          = 'attribs';
-		$category->field_mappings->common->core_featured        = 'null';
-		$category->field_mappings->common->core_metadata        = 'metadata';
-		$category->field_mappings->common->core_language        = 'null';
-		$category->field_mappings->common->core_images          = 'null';
-		$category->field_mappings->common->core_urls            = 'null';
-		$category->field_mappings->common->core_version         = 'null';
-		$category->field_mappings->common->core_ordering        = 'lft';
-		$category->field_mappings->common->core_metakey         = 'metakey';
-		$category->field_mappings->common->core_metadesc        = 'metadesc';
-		$category->field_mappings->common->core_catid           = 'null';
-		$category->field_mappings->common->core_xreference      = 'null';
-		$category->field_mappings->common->asset_id             = 'null';
-		$category->field_mappings->special                      = new stdClass();
-		$category->field_mappings                               = json_encode($category->field_mappings);
-		$category->router                                       = 'BoardHelperRoute::getListRoute';
-		$category->content_history_options                      = '';
-
-		(!empty($current_id)) ? $db->updateObject('#__content_types', $category, 'type_id')
-			: $db->insertObject('#__content_types', $category);
-
 		// Item
+		$db = Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select('type_id')
 			->from($db->quoteName('#__content_types'))
@@ -225,33 +128,6 @@ class com_BoardInstallerScript
 			: $db->insertObject('#__content_types', $item);
 	}
 
-
-	/**
-	 * Move layouts folder
-	 *
-	 * @param string $path path to files
-	 *
-	 * @since  1.0.0
-	 */
-	protected function moveLayouts($path)
-	{
-		$component = JPATH_ADMINISTRATOR . $path . '/layouts';
-		$layouts   = JPATH_ROOT . '/layouts' . $path;
-
-		if (!JFolder::exists(JPATH_ROOT . '/layouts/components'))
-		{
-			JFolder::create(JPATH_ROOT . '/layouts/components');
-		}
-
-		if (JFolder::exists($layouts))
-		{
-			JFolder::delete($layouts);
-		}
-
-		JFolder::move($component, $layouts);
-
-	}
-
 	/**
 	 *
 	 * Called on uninstallation
@@ -266,20 +142,10 @@ class com_BoardInstallerScript
 		// Remove content_type
 		$query = $db->getQuery(true)
 			->delete($db->quoteName('#__content_types'))
-			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.category'));
-		$db->setQuery($query)->execute();
-
-		$query = $db->getQuery(true)
-			->delete($db->quoteName('#__content_types'))
 			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.item'));
 		$db->setQuery($query)->execute();
 
 		// Remove tag_map
-		$query = $db->getQuery(true)
-			->delete($db->quoteName('#__contentitem_tag_map'))
-			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.category'));
-		$db->setQuery($query)->execute();
-
 		$query = $db->getQuery(true)
 			->delete($db->quoteName('#__contentitem_tag_map'))
 			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.item'));
@@ -288,19 +154,11 @@ class com_BoardInstallerScript
 		// Remove ucm_content
 		$query = $db->getQuery(true)
 			->delete($db->quoteName('#__ucm_content'))
-			->where($db->quoteName('core_type_alias') . ' = ' . $db->quote('com_board.category'));
-		$db->setQuery($query)->execute();
-
-		$query = $db->getQuery(true)
-			->delete($db->quoteName('#__ucm_content'))
 			->where($db->quoteName('core_type_alias') . ' = ' . $db->quote('com_board.item'));
 		$db->setQuery($query)->execute();
 
 		// Remove images
 		JFolder::delete(JPATH_ROOT . '/images/board');
-
-		// Remove layouts
-		JFolder::delete(JPATH_ROOT . '/layouts/components/com_board');
 	}
 
 	/**
@@ -334,6 +192,88 @@ class com_BoardInstallerScript
 							JLog::WARNING, 'jerror');
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Remove categories
+	 *
+	 * @param  \stdClass $parent - Parent object calling object.
+	 *
+	 * @return void
+	 *
+	 * @since  1.1.0
+	 */
+	public function update($parent)
+	{
+		$db = Factory::getDbo();
+
+		// Remove ucm_content
+		$query = $db->getQuery(true)
+			->delete($db->quoteName('#__ucm_content'))
+			->where($db->quoteName('core_type_alias') . ' = ' . $db->quote('com_board.category'));
+		$db->setQuery($query)->execute();
+
+		// Remove tag_map
+		$query = $db->getQuery(true)
+			->delete($db->quoteName('#__contentitem_tag_map'))
+			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.category'));
+		$db->setQuery($query)->execute();
+
+		// Remove content_type
+		$query = $db->getQuery(true)
+			->delete($db->quoteName('#__content_types'))
+			->where($db->quoteName('type_alias') . ' = ' . $db->quote('com_board.category'));
+		$db->setQuery($query)->execute();
+
+		// Remove table
+		$db->setQuery('DROP TABLE IF EXISTS `#__board_categories`')->execute();
+
+		// Remove folders
+		$folders = array(
+			'/administrator/components/com_board/views/categories',
+			'/administrator/components/com_board/views/category',
+			'/layouts/components/com_board',
+			'/components/com_board/views/map',
+			'/images/board/categories',
+			'/media/com_board/js',
+			'/media/com_board/images',
+		);
+		foreach ($folders as $folder)
+		{
+			if (JFolder::exists(JPATH_ROOT . $folder))
+			{
+				JFolder::delete(JPATH_ROOT . $folder);
+			}
+		}
+
+		$files = array(
+			'/administrator/components/com_board/controllers/categories.php',
+			'/administrator/components/com_board/controllers/category.php',
+			'/administrator/components/com_board/models/categories.php',
+			'/administrator/components/com_board/models/category.php',
+			'/administrator/components/com_board/models/fields/boardcategory.php',
+			'/administrator/components/com_board/models/fields/boardauthor.php',
+			'/administrator/components/com_board/models/forms/filter_categories.xml',
+			'/administrator/components/com_board/models/forms/category.xml',
+			'/administrator/components/com_board/tables/categories.php',
+			'/components/com_board/models/fields/boardcategory.php',
+			'/components/com_board/models/map.php',
+			'/components/com_board/controllers/map.php',
+			'/components/com_board/views/form/tmpl/default_categories.php',
+			'/media/com_board/css/admin-category.css',
+			'/media/com_board/css/admin-category.min.css',
+			'/media/com_board/css/form-categories.css',
+			'/media/com_board/css/form-categories.min.css',
+			'/media/com_board/css/map.css',
+			'/media/com_board/css/map.min.css',
+		);
+		foreach ($files as $file)
+		{
+			if (JFile::exists(JPATH_ROOT . $file))
+			{
+				JFile::delete(JPATH_ROOT . $file);
 			}
 		}
 	}
