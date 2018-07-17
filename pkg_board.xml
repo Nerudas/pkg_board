@@ -10,7 +10,6 @@
 	<authorUrl>nerudas.ru</authorUrl>
 	<version>1.1.0</version>
 	<description>PKG_BOARD_DESCRIPTION</description>
-	<scriptfile>script.php</scriptfile>
 	<languages folder="language">
 		<language tag="en-GB">en-GB/en-GB.pkg_board.sys.ini</language>
 		<language tag="ru-RU">ru-RU/ru-RU.pkg_board.sys.ini</language>
