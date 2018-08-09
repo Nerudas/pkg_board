@@ -17,7 +17,6 @@
 			   description="JGLOBAL_FIELD_PRICE_DESC"
 			   contract_price="true"
 			   between="true"/>
-
 		<field name="payment_method" type="checkboxes"
 			   label="COM_BOARD_ITEM_PAYMENT_METHOD">
 			<option value="cashless">COM_BOARD_ITEM_PAYMENT_METHOD_CASHLESS</option>
@@ -29,8 +28,6 @@
 			<option value="required">COM_BOARD_ITEM_PREPAYMENT_REQUIRED</option>
 			<option value="no">COM_BOARD_ITEM_PREPAYMENT_NO</option>
 		</field>
-
-		<!--<field name="allregions" type="checkbox" label="COM_BOARD_ALLREGIONS" value="1"/>-->
 		<field name="onlymy" type="checkbox" label="COM_BOARD_ONLYMY" value="1"/>
 	</fields>
 </form>

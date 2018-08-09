@@ -24,7 +24,6 @@ use Joomla\CMS\Layout\LayoutHelper;
 
 class BoardModelList extends ListModel
 {
-
 	/**
 	 * This tag
 	 *
@@ -145,9 +144,6 @@ class BoardModelList extends ListModel
 		$prepayment = $this->getUserStateFromRequest($this->context . '.filter.prepayment', 'filter_prepayment', '');
 		$this->setState('filter.prepayment', $prepayment);
 
-		$allregions = $this->getUserStateFromRequest($this->context . '.filter.allregions', 'filter_allregions', '');
-		$this->setState('filter.allregions', $allregions);
-
 		$author_id = $this->getUserStateFromRequest($this->context . '.filter.author_id', 'filter_author_id', '');
 		$this->setState('filter.author_id', $author_id);
 
@@ -235,9 +231,8 @@ class BoardModelList extends ListModel
 
 
 		// Join over the regions.
-		$query->select(array('r.id as region_id', 'r.name AS region_name'))
-			->join('LEFT', '#__regions AS r ON r.id = 
-					(CASE i.region WHEN ' . $db->quote('*') . ' THEN 100 ELSE i.region END)');
+		$query->select(array('r.id as region_id', 'r.name as region_name', 'r.icon as region_icon'))
+			->join('LEFT', '#__location_regions AS r ON r.id = i.region');
 
 		// Filter by access level.
 		if (!$user->authorise('core.admin'))
@@ -528,6 +523,14 @@ class BoardModelList extends ListModel
 					$item->tags->itemTags = ArrayHelper::sortObjects($item->tags->itemTags, 'main', -1);
 				}
 
+				// Get region
+				$item->region_icon = (!empty($item->region_icon) && JFile::exists(JPATH_ROOT . '/' . $item->region_icon)) ?
+					Uri::root(true) . $item->region_icon : false;
+				if ($item->region == '*')
+				{
+					$item->region_icon = false;
+					$item->region_name = Text::_('JGLOBAL_FIELD_REGIONS_ALL');
+				}
 
 				// Get placemark
 				$item->placemark = ($item->map) ? $item->map->get('placemark') : false;
