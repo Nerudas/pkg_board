@@ -17,6 +17,7 @@ use Joomla\CMS\Date\Date;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Language\Text;
 
 class BoardModelItems extends ListModel
 {
