@@ -17,7 +17,9 @@
 			   multiple="true"
 			   class="multipleTags"
 			   onchange="this.form.submit();"/>
-		<field name="region" type="regions" show_null="true" onchange="this.form.submit();"/>
+		<field name="region" type="regions" onchange="this.form.submit();">
+			<option value="">JGLOBAL_FIELD_REGIONS_NULL</option>
+		</field>
 	</fields>
 
 	<fields name="list">
