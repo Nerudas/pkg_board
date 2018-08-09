@@ -20,6 +20,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 class BoardModelItem extends AdminModel
 {
@@ -248,17 +249,7 @@ class BoardModelItem extends AdminModel
 		{
 			$data['created'] = Factory::getDate()->toSql();
 		}
-		if (empty($data['region']))
-		{
-			$data['region'] = $app->input->cookie->get('region', '*');
-		}
 
-//		//Remove actual function
-//		if (!empty($data['actual']) && empty($data['publish_down']))
-//		{
-//			$publish_down         = new \Joomla\CMS\Date\Date($data['actual']);
-//			$data['publish_down'] = $publish_down->toSql();
-//		}
 
 		if (isset($data['metadata']) && isset($data['metadata']['author']))
 		{
@@ -304,6 +295,14 @@ class BoardModelItem extends AdminModel
 			$data['created_by'] = Factory::getUser()->id;
 		}
 
+		BaseDatabaseModel::addIncludePath(JPATH_SITE . '/components/com_location/models', 'LocationModel');
+		$regionsModel = BaseDatabaseModel::getInstance('Regions', 'LocationModel', array('ignore_request' => false));
+		if (empty($data['region']))
+		{
+			$data['region'] = ($app->isSite()) ? $regionsModel->getVisitorRegion()->id : $regionsModel->getProfileRegion($data['created_by'])->id;
+		}
+		$region = $regionsModel->getRegion($data['region']);
+
 		if (isset($data['attribs']) && is_array($data['attribs']))
 		{
 			$registry        = new Registry($data['attribs']);
@@ -317,6 +316,11 @@ class BoardModelItem extends AdminModel
 		}
 
 		// Get tags search
+		$data['tags'] = (is_array($data['tags'])) ? $data['tags'] : array();
+		if ($region && !empty($region->items_tags))
+		{
+			$data['tags'] = array_unique(array_merge($data['tags'], explode(',', $region->items_tags)));
+		}
 		if (!empty($data['tags']))
 		{
 			$query = $db->getQuery(true)

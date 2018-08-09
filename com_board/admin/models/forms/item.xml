@@ -50,8 +50,9 @@
 	<fieldset name="contacts" label="COM_BOARD_ITEM_CONTACTS">
 		<field name="region" type="regions"
 			   label="JGLOBAL_FIELD_REGIONS_LABEL"
-			   description="JGLOBAL_FIELD_REGIONS_DESC"
-			   show_all="true"/>
+			   description="JGLOBAL_FIELD_REGIONS_DESC">
+			<option value="">JGLOBAL_FIELD_REGIONS_NULL</option>
+		</field>
 		<fields name="contacts">
 			<field name="phones" type="phones"
 				   label="JGLOBAL_FIELD_PHONES_LABEL"
@@ -131,16 +132,6 @@
 			<option value="today">COM_BOARD_ITEM_FOR_WHEN_TODAY</option>
 			<option value="tomorrow">COM_BOARD_ITEM_FOR_WHEN_TOMORROW</option>
 		</field>
-		<!-- Remove actual function-->
-		<!--<field name="actual" type="radio"-->
-		<!--label="COM_BOARD_ITEM_ACTUAL"-->
-		<!--class="btn-group"-->
-		<!--default="1 week">-->
-		<!--<option value="1 day">COM_BOARD_ITEM_ACTUAL_DAY</option>-->
-		<!--<option value="3 day">COM_BOARD_ITEM_ACTUAL_THREEDAY</option>-->
-		<!--<option value="1 week">COM_BOARD_ITEM_ACTUAL_WEEK</option>-->
-		<!--<option value="1 month">COM_BOARD_ITEM_ACTUAL_MONTH</option>-->
-		<!--</field>-->
 		<field name="publish_down" type="calendar"
 			   label="JGLOBAL_FIELD_PUBLISH_DOWN_LABEL"
 			   description="JGLOBAL_FIELD_PUBLISH_DOWN_DESC"
