@@ -22,3 +22,6 @@ Module for displaying information about board items in the admin panel
 
 * **Bulletin Board - Tags Module**  
 Module for displaying companies tags
+
+* **Sitemap - Bulletin Board Plugin**  
+Plugin for adding the Bulletin board section to sitemap

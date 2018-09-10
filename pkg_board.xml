@@ -19,6 +19,7 @@
 		<folder type="module" id="mod_board_latest" client="site">mod_board_latest</folder>
 		<folder type="module" id="mod_board_tags" client="site">mod_board_tags</folder>
 		<folder type="module" id="mod_board_admin" client="administrator">mod_board_admin</folder>
+		<folder type="plugin" id="board" group="sitemap">plg_sitemap_board</folder>
 	</files>
 	<updateservers>
 		<server type="extension" priority="1" name="Board Package">
