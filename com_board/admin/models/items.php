@@ -17,7 +17,6 @@ use Joomla\CMS\Date\Date;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Language\Text;
 
 class BoardModelItems extends ListModel
 {
@@ -142,13 +141,11 @@ class BoardModelItems extends ListModel
 		$query->select(array(
 			'author.id as author_id',
 			'author.name as author_name',
-			'author.avatar as author_avatar',
 			'author.status as author_status',
 			'(session.time IS NOT NULL) AS author_online',
 			'(company.id IS NOT NULL) AS author_job',
 			'company.id as author_job_id',
 			'company.name as author_job_name',
-			'company.logo as author_job_logo',
 			'employees.position as  author_position'
 		))
 			->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
@@ -162,7 +159,7 @@ class BoardModelItems extends ListModel
 			->join('LEFT', '#__viewlevels AS ag ON ag.id = i.access');
 
 		// Join over the regions.
-		$query->select(array('r.id as region_id', 'r.name as region_name', 'r.icon as region_icon'))
+		$query->select(array('r.id as region_id', 'r.name as region_name'))
 			->join('LEFT', '#__location_regions AS r ON r.id = i.region');
 
 		// Filter by access level.
@@ -260,16 +257,15 @@ class BoardModelItems extends ListModel
 		{
 			$today    = new Date(date('Y-m-d'));
 			$mainTags = ComponentHelper::getParams('com_board')->get('tags', array());
+			JLoader::register('FieldTypesFilesHelper', JPATH_PLUGINS . '/fieldtypes/files/helper.php');
+			$imagesHelper = new FieldTypesFilesHelper();
 			foreach ($items as &$item)
 			{
 				$item->for_when = ($item->created >= $today->toSql()) ? $item->for_when : '';
 
-				$author_avatar       = (!empty($item->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $item->author_avatar)) ?
-					$item->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
+				$author_avatar       = $imagesHelper->getImage('avatar', 'images/profiles/' . $item->author_id,
+					'media/com_profiles/images/no-avatar.jpg', false);
 				$item->author_avatar = Uri::root(true) . '/' . $author_avatar;
-
-				$item->author_job_logo = (!empty($item->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $item->author_job_logo)) ?
-					Uri::root(true) . '/' . $item->author_job_logo : false;
 
 				// Get Tags
 				$item->tags = new TagsHelper;
@@ -281,15 +277,6 @@ class BoardModelItems extends ListModel
 						$tag->main = (in_array($tag->id, $mainTags));
 					}
 					$item->tags->itemTags = ArrayHelper::sortObjects($item->tags->itemTags, 'main', -1);
-				}
-
-				// Get region
-				$item->region_icon = (!empty($item->region_icon) && JFile::exists(JPATH_ROOT . '/' . $item->region_icon)) ?
-					Uri::root(true) . $item->region_icon : false;
-				if ($item->region == '*')
-				{
-					$item->region_icon = false;
-					$item->region_name = Text::_('JGLOBAL_FIELD_REGIONS_ALL');
 				}
 			}
 		}
