@@ -12,6 +12,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\Registry\Registry;
 
 class com_BoardInstallerScript
 {
@@ -29,6 +30,7 @@ class com_BoardInstallerScript
 		$this->tagsIntegration();
 		$this->createImageFolders();
 		$this->moveLayouts($path);
+
 		return true;
 	}
 
@@ -64,7 +66,7 @@ class com_BoardInstallerScript
 	protected function tagsIntegration()
 	{
 		// Item
-		$db = Factory::getDbo();
+		$db    = Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select('type_id')
 			->from($db->quoteName('#__content_types'))
@@ -219,6 +221,73 @@ class com_BoardInstallerScript
 					{
 						JLog::add(Text::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $e->getMessage()),
 							JLog::WARNING, 'jerror');
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove categories
+	 *
+	 * @param  \stdClass $parent - Parent object calling object.
+	 *
+	 * @return void
+	 *
+	 * @since  1.2.0
+	 */
+	public function update($parent)
+	{
+
+		$db    = Factory::getDbo();
+		$table = '#__board_items';
+
+		$query = $db->getQuery(true)
+			->select('*')
+			->from($db->quoteName($table));
+		$db->setQuery($query);
+		$items = $db->loadObjectList();
+
+		foreach ($items as $item)
+		{
+			$registry     = new Registry($item->images);
+			$images       = $registry->toArray();
+			$newImages    = array();
+			$updateImages = false;
+			foreach ($images as $image)
+			{
+				if (!isset($image['ordering']))
+				{
+					$updateImages              = true;
+					$newImage                  = new stdClass();
+					$newImage->ordering        = count($newImages) + 1;
+					$newImages[$image['file']] = $newImage;
+				}
+			}
+			if ($updateImages)
+			{
+				$registry     = new Registry($newImages);
+				$item->images = $registry->toString('json', array('bitmask' => JSON_UNESCAPED_UNICODE));
+			}
+
+			$registry       = new Registry($item->contacts);
+			$item->contacts = $registry->toString('json', array('bitmask' => JSON_UNESCAPED_UNICODE));
+
+			$db->updateObject($table, $item, array('id'));
+
+			$oldFolder = JPATH_ROOT . '/images/board/items/' . $item->id;
+			$newFolder = $oldFolder . '/content';
+			if (!JFolder::exists($newFolder))
+			{
+				JFolder::create($newFolder);
+				JFile::write($newFolder . '/index.html', '<!DOCTYPE html><title></title>');
+				$files = JFolder::files($oldFolder, '', false);
+
+				foreach ($files as $file)
+				{
+					if ($file != 'index.html' && !preg_match('/meta/', $file))
+					{
+						JFile::move($oldFolder . '/' . $file, $newFolder . '/' . $file);
 					}
 				}
 			}
