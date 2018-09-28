@@ -23,6 +23,8 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Layout\LayoutHelper;
 
+JLoader::register('FieldTypesFilesHelper', JPATH_PLUGINS . '/fieldtypes/files/helper.php');
+
 class BoardModelItem extends ItemModel
 {
 	/**
@@ -111,13 +113,11 @@ class BoardModelItem extends ItemModel
 				$query->select(array(
 					'author.id as author_id',
 					'author.name as author_name',
-					'author.avatar as author_avatar',
 					'author.status as author_status',
 					'(session.time IS NOT NULL) AS author_online',
 					'(company.id IS NOT NULL) AS author_job',
 					'company.id as author_job_id',
 					'company.name as author_job_name',
-					'company.logo as author_job_logo',
 					'employees.position as  author_position'
 				))
 					->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
@@ -127,7 +127,7 @@ class BoardModelItem extends ItemModel
 					->join('LEFT', '#__companies AS company ON company.id = employees.company_id AND company.state = 1');
 
 				// Join over the regions.
-				$query->select(array('r.id as region_id', 'r.name as region_name', 'r.icon as region_icon'))
+				$query->select(array('r.id as region_id', 'r.name as region_name'))
 					->join('LEFT', '#__location_regions AS r ON r.id = i.region');
 
 				// Filter by published state.
@@ -202,22 +202,27 @@ class BoardModelItem extends ItemModel
 				$data->map = (!empty($data->latitude) && !empty($data->longitude) &&
 					$data->latitude !== '0.000000' && $data->longitude !== '0.000000') ? new Registry($data->map) : false;
 
+				$imagesHelper = new FieldTypesFilesHelper();
+
 				// Convert the images field to an array.
+				$imageFolder  = 'images/board/items/' . $data->id;
 				$registry     = new Registry($data->images);
 				$data->images = $registry->toArray();
-				$data->image  = (!empty($data->images) && !empty(reset($data->images)['src'])) ?
-					reset($data->images)['src'] : false;
+				$data->images = $imagesHelper->getImages('content', $imageFolder, $data->images,
+					array('text' => true, 'for_field' => false));
+				$data->image  = (!empty($data->images) && !empty(reset($data->images)->src)) ?
+					reset($data->images)->src : false;
+
 
 				// Convert the metadata field
 				$data->metadata = new Registry($data->metadata);
 
 				// Prepare author data
-				$author_avatar         = (!empty($data->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $data->author_avatar)) ?
-					$data->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
-				$data->author_avatar   = Uri::root(true) . '/' . $author_avatar;
-				$data->author_link     = Route::_(ProfilesHelperRoute::getProfileRoute($data->author_id));
-				$data->author_job_logo = (!empty($data->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $data->author_job_logo)) ?
-					Uri::root(true) . '/' . $data->author_job_logo : false;
+				$author_avatar       = $imagesHelper->getImage('avatar', 'images/profiles/' . $data->author_id,
+					'media/com_profiles/images/no-avatar.jpg', false);
+				$data->author_avatar = Uri::root(true) . '/' . $author_avatar;
+				$data->author_link   = Route::_(ProfilesHelperRoute::getProfileRoute($data->author_id));
+
 				$data->author_job_link = Route::_(CompaniesHelperRoute::getCompanyRoute($data->author_job_id));
 
 				// Get Tags

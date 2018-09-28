@@ -22,6 +22,8 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 
+JLoader::register('FieldTypesFilesHelper', JPATH_PLUGINS . '/fieldtypes/files/helper.php');
+
 class BoardModelList extends ListModel
 {
 	/**
@@ -214,13 +216,11 @@ class BoardModelList extends ListModel
 		$query->select(array(
 			'author.id as author_id',
 			'author.name as author_name',
-			'author.avatar as author_avatar',
 			'author.status as author_status',
 			'(session.time IS NOT NULL) AS author_online',
 			'(company.id IS NOT NULL) AS author_job',
 			'company.id as author_job_id',
 			'company.name as author_job_name',
-			'company.logo as author_job_logo',
 			'employees.position as  author_position'
 		))
 			->join('LEFT', '#__profiles AS author ON author.id = i.created_by')
@@ -231,7 +231,7 @@ class BoardModelList extends ListModel
 
 
 		// Join over the regions.
-		$query->select(array('r.id as region_id', 'r.name as region_name', 'r.icon as region_icon'))
+		$query->select(array('r.id as region_id', 'r.name as region_name'))
 			->join('LEFT', '#__location_regions AS r ON r.id = i.region');
 
 		// Filter by access level.
@@ -451,10 +451,10 @@ class BoardModelList extends ListModel
 		$items = parent::getItems();
 		if (!empty($items))
 		{
-			$today    = new Date(date('Y-m-d'));
-			$user     = Factory::getUser();
-			$mainTags = ComponentHelper::getParams('com_board')->get('tags', array());
-
+			$today        = new Date(date('Y-m-d'));
+			$user         = Factory::getUser();
+			$mainTags     = ComponentHelper::getParams('com_board')->get('tags', array());
+			$imagesHelper = new FieldTypesFilesHelper();
 			foreach ($items as &$item)
 			{
 				$item->for_when = ($item->created >= $today->toSql()) ? $item->for_when : '';
@@ -497,18 +497,20 @@ class BoardModelList extends ListModel
 					$item->latitude !== '0.000000' && $item->longitude !== '0.000000') ? new Registry($item->map) : false;
 
 				// Convert the images field to an array.
+
+				$imageFolder  = 'images/board/items/' . $item->id;
 				$registry     = new Registry($item->images);
 				$item->images = $registry->toArray();
-				$item->image  = (!empty($item->images) && !empty(reset($item->images)['src'])) ?
-					reset($item->images)['src'] : false;
+				$item->images = $imagesHelper->getImages('content', $imageFolder, $item->images,
+					array('text' => true, 'for_field' => false));
+				$item->image  = (!empty($item->images) && !empty(reset($item->images)->src)) ?
+					reset($item->images)->src : false;
 
 				// Prepare author data
-				$author_avatar         = (!empty($item->author_avatar) && JFile::exists(JPATH_ROOT . '/' . $item->author_avatar)) ?
-					$item->author_avatar : 'media/com_profiles/images/no-avatar.jpg';
+				$author_avatar         = $imagesHelper->getImage('avatar', 'images/profiles/' . $item->author_id,
+					'media/com_profiles/images/no-avatar.jpg', false);
 				$item->author_avatar   = Uri::root(true) . '/' . $author_avatar;
 				$item->author_link     = Route::_(ProfilesHelperRoute::getProfileRoute($item->author_id));
-				$item->author_job_logo = (!empty($item->author_job_logo) && JFile::exists(JPATH_ROOT . '/' . $item->author_job_logo)) ?
-					Uri::root(true) . '/' . $item->author_job_logo : false;
 				$item->author_job_link = Route::_(CompaniesHelperRoute::getCompanyRoute($item->author_job_id));
 
 				// Get Tags
@@ -524,13 +526,7 @@ class BoardModelList extends ListModel
 				}
 
 				// Get region
-				$item->region_icon = (!empty($item->region_icon) && JFile::exists(JPATH_ROOT . '/' . $item->region_icon)) ?
-					Uri::root(true) . $item->region_icon : false;
-				if ($item->region == '*')
-				{
-					$item->region_icon = false;
-					$item->region_name = Text::_('JGLOBAL_FIELD_REGIONS_ALL');
-				}
+				$item->region_icon = $imagesHelper->getImage('icon', 'images/location/regions/' . $item->region_id, false, false);
 
 				// Get placemark
 				$item->placemark = ($item->map) ? $item->map->get('placemark') : false;
