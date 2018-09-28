@@ -18,11 +18,13 @@
 			   label="JTAG"
 			   description="JTAG_DESC"
 			   multiple="true"/>
-		<field name="images" type="ajaximage"
-			   multiple="true"
+		<field name="images" type="images"
+			   label="COM_BOARD_ITEM_IMAGES"
+			   folder_field="images_folder"
+			   folder="content"
+			   text="false"
 			   unique="true"
-			   limit="5"
-			   label="COM_BOARD_ITEM_IMAGES"/>
+			   limit="5"/>
 		<field name="map" type="map"
 			   label="JGLOBAL_FIELD_MAP_LABEL"
 			   description="JGLOBAL_FIELD_MAP_DESC"/>
@@ -100,7 +102,8 @@
 	</fieldset>
 
 	<fieldset name="hidden">
-		<field name="imagefolder" type="imagefolder" path="images/board/items"/>
+		<field name="images_folder" type="folder"
+			   label="JGLOBAL_FIELD_IMAGES_FOLDER_LABEL"/>
 		<field name="region" type="hidden"/>
 		<field name="state" type="hidden" default="1"/>
 		<field name="access" type="hidden" readonly="true"/>
