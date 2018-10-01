@@ -44,6 +44,7 @@ class com_BoardInstallerScript
 		$folders = array(
 			'images/board',
 			'images/board/items',
+			'images/board/tags',
 		);
 
 

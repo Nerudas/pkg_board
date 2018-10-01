@@ -3,7 +3,7 @@
 	<name>PKG_BOARD</name>
 	<packagename>board</packagename>
 	<author>Nerudas</author>
-	<creationDate>September 2018</creationDate>
+	<creationDate>October 2018</creationDate>
 	<copyright>Copyright (c) 2015 - 2018 Nerudas. All rights reserved.</copyright>
 	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
 	<authorEmail>support@nerudas.ru</authorEmail>
@@ -20,6 +20,7 @@
 		<folder type="module" id="mod_board_tags" client="site">mod_board_tags</folder>
 		<folder type="module" id="mod_board_admin" client="administrator">mod_board_admin</folder>
 		<folder type="plugin" id="board" group="sitemap">plg_sitemap_board</folder>
+		<folder type="plugin" id="tags_board_meta" group="content">plg_content_tags_board_meta</folder>
 	</files>
 	<updateservers>
 		<server type="extension" priority="1" name="Board Package">

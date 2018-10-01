@@ -25,3 +25,6 @@ Module for displaying companies tags
 
 * **Sitemap - Bulletin Board Plugin**  
 Plugin for adding the Bulletin board section to sitemap
+
+* **Content - Tags Board Metadata Plugin**  
+Plugin for adding metadata fields in com_tags
