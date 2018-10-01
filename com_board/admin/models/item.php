@@ -14,7 +14,6 @@ use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Factory;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Helper\TagsHelper;
-use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
@@ -57,10 +56,6 @@ class BoardModelItem extends AdminModel
 	{
 		if ($item = parent::getItem($pk))
 		{
-			// Convert the metadata field to an array.
-			$registry       = new Registry($item->metadata);
-			$item->metadata = $registry->toArray();
-
 			// Convert the contacts field to an array.
 			$registry       = new Registry($item->contacts);
 			$item->contacts = $registry->toArray();
@@ -217,7 +212,6 @@ class BoardModelItem extends AdminModel
 	{
 		$app    = Factory::getApplication();
 		$pk     = (!empty($data['id'])) ? $data['id'] : (int) $this->getState($this->getName() . '.id');
-		$filter = InputFilter::getInstance();
 		$table  = $this->getTable();
 		$db     = Factory::getDbo();
 		$isNew  = true;
@@ -234,11 +228,6 @@ class BoardModelItem extends AdminModel
 			$data['created'] = Factory::getDate()->toSql();
 		}
 
-
-		if (isset($data['metadata']) && isset($data['metadata']['author']))
-		{
-			$data['metadata']['author'] = $filter->clean($data['metadata']['author'], 'TRIM');
-		}
 
 		if (isset($data['contacts']) && is_array($data['contacts']))
 		{
@@ -266,12 +255,6 @@ class BoardModelItem extends AdminModel
 		{
 			$registry        = new Registry($data['attribs']);
 			$data['attribs'] = $registry->toString('json', array('bitmask' => JSON_UNESCAPED_UNICODE));
-		}
-
-		if (isset($data['metadata']) && is_array($data['metadata']))
-		{
-			$registry         = new Registry($data['metadata']);
-			$data['metadata'] = $registry->toString('json', array('bitmask' => JSON_UNESCAPED_UNICODE));
 		}
 
 		if (empty($data['created_by']))

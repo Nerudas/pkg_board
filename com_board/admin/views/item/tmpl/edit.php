@@ -88,7 +88,6 @@ $doc->addScriptDeclaration('
 				<?php echo $this->form->renderFieldset('publishingdata'); ?>
 			</div>
 			<div class="span6">
-				<?php echo $this->form->renderFieldset('metadata'); ?>
 			</div>
 		</div>
 		<?php echo HTMLHelper::_('bootstrap.endTab'); ?>

@@ -114,13 +114,5 @@
 		<field name="hits" type="hidden" readonly="true"/>
 		<field name="id" type="hidden" default="0" readonly="true"/>
 		<field name="category" type="hidden" default="0"/>
-		<field name="metakey" type="hidden" readonly="true"/>
-		<field name="metadesc" type="hidden" readonly="true"/>
-		<fields name="metadata">
-			<field name="robots" type="hidden" readonly="true"/>
-			<field name="author" type="hidden" readonly="true"/>
-			<field name="rights" type="hidden" readonly="true"/>
-			<field name="xreference" type="hidden" readonly="true"/>
-		</fields>
 	</fieldset>
 </form>

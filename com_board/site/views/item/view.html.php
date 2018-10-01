@@ -16,6 +16,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Utilities\ArrayHelper;
 
 class BoardViewItem extends HtmlView
 {
@@ -194,22 +195,20 @@ class BoardViewItem extends HtmlView
 	 */
 	protected function _prepareDocument()
 	{
-		$app      = Factory::getApplication();
-		$pathway  = $app->getPathway();
-		$item     = $this->item;
-		$url      = rtrim(URI::root(), '/') . $item->link;
-		$sitename = $app->get('sitename');
-		$menus    = $app->getMenu();
-		$menu     = $menus->getActive();
-		$id       = (int) @$menu->query['id'];
-
+		$app       = Factory::getApplication();
+		$pathway   = $app->getPathway();
+		$item      = $this->item;
+		$canonical = rtrim(URI::root(), '/') . $item->link;
+		$sitename  = $app->get('sitename');
+		$menu      = $app->getMenu()->getActive();
+		$id        = (int) @$menu->query['id'];
 		if ($menu)
 		{
 			$this->params->def('page_heading', $this->params->get('page_title', $menu->title));
 		}
 		else
 		{
-			$this->params->def('page_heading', Text::_('COM_BOARD_ITEM'));
+			$this->params->def('page_heading', Text::_('COM_COMPANIES_COMPANY'));
 		}
 		$title = $this->params->get('page_title', $sitename);
 
@@ -242,56 +241,44 @@ class BoardViewItem extends HtmlView
 		$this->document->setTitle($title);
 
 		// Set Meta Description
-		if (!empty($item->metadesc))
-		{
-			$this->document->setDescription($item->metadesc);
-		}
-		elseif ($this->params->get('menu-meta_description'))
+		if ($this->params->get('menu-meta_description'))
 		{
 			$this->document->setDescription($this->params->get('menu-meta_description'));
 		}
+		elseif (!empty($item->text))
+		{
+			$this->document->setDescription(JHtmlString::truncate($item->text, 150, false, false));
+		}
 
 		// Set Meta Keywords
-		if (!empty($item->metakey))
-		{
-			$this->document->setMetadata('keywords', $item->metakey);
-		}
-		elseif ($this->params->get('menu-meta_keywords'))
+		if ($this->params->get('menu-meta_keywords'))
 		{
 			$this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
 		}
+		elseif (!empty(($item->tags->itemTags)))
+		{
+			$this->document->setMetadata('keywords', implode(', ',
+				ArrayHelper::getColumn($this->item->tags->itemTags, 'title')));
+		}
 
 		// Set Meta Robots
-		if ($item->metadata->get('robots', ''))
-		{
-			$this->document->setMetadata('robots', $item->metadata->get('robots', ''));
-		}
-		elseif ($this->params->get('robots'))
+		if ($this->params->get('robots'))
 		{
 			$this->document->setMetadata('robots', $this->params->get('robots'));
 		}
 
-		// Set Meta Author
-		if ($app->get('MetaAuthor') == '1' && $item->metadata->get('author', ''))
-		{
-			$this->document->setMetaData('author', $item->metadata->get('author'));
-		}
-
-		// Set Meta Rights
-		if ($item->metadata->get('rights', ''))
-		{
-			$this->document->setMetaData('author', $item->metadata->get('rights'));
-		}
-
 		// Set Meta Image
-		if ($item->metadata->get('image', ''))
-		{
-			$this->document->setMetaData('image', URI::base() . $item->metadata->get('image'));
-		}
-		elseif ($this->params->get('menu-meta_image', ''))
+		if ($this->params->get('menu-meta_image', ''))
 		{
 			$this->document->setMetaData('image', Uri::base() . $this->params->get('menu-meta_image'));
 		}
+		elseif ($item->image)
+		{
+			$this->document->setMetaData('image', Uri::root() . $item->image);
+		}
+
+		// Set canonical
+		$this->document->addHeadLink(rtrim(URI::root(), '/') . Route::_(BoardHelperRoute::getListRoute()), 'canonical');
 
 		// Set Meta twitter
 		$this->document->setMetaData('twitter:card', 'summary_large_image');
@@ -306,7 +293,7 @@ class BoardViewItem extends HtmlView
 		{
 			$this->document->setMetaData('twitter:image', $this->document->getMetaData('image'));
 		}
-		$this->document->setMetaData('twitter:url', $url);
+		$this->document->setMetaData('twitter:url', $canonical);
 
 		// Set Meta Open Graph
 		$this->document->setMetadata('og:type', 'website', 'property');
@@ -320,7 +307,17 @@ class BoardViewItem extends HtmlView
 		{
 			$this->document->setMetaData('og:image', $this->document->getMetaData('image'), 'property');
 		}
-		$this->document->setMetaData('og:url', $url, 'property');
+		$this->document->setMetaData('og:url', $canonical, 'property');
 
+		// No doubles
+
+		$uri = Uri::getInstance();
+		$url = urldecode($uri->toString());
+		if ($url !== $canonical)
+		{
+
+			$app->redirect($canonical, true);
+
+		}
 	}
 }

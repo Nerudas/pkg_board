@@ -213,10 +213,6 @@ class BoardModelItem extends ItemModel
 				$data->image  = (!empty($data->images) && !empty(reset($data->images)->src)) ?
 					reset($data->images)->src : false;
 
-
-				// Convert the metadata field
-				$data->metadata = new Registry($data->metadata);
-
 				// Prepare author data
 				$author_avatar       = $imagesHelper->getImage('avatar', 'images/profiles/' . $data->author_id,
 					'media/com_profiles/images/no-avatar.jpg', false);

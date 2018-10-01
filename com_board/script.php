@@ -242,12 +242,30 @@ class com_BoardInstallerScript
 
 		$db    = Factory::getDbo();
 		$table = '#__board_items';
+		$columns = $db->getTableColumns($table);
+		// Remove metakey"
+		if (isset($columns['metakey']))
+		{
+			$db->setQuery("ALTER TABLE " . $table . " DROP metakey")->query();
+		}
+		// Remove metadesc
+		if (isset($columns['metadesc']))
+		{
+			$db->setQuery("ALTER TABLE " . $table . " DROP metadesc")->query();
+		}
+		// Remove metadata
+		if (isset($columns['metadata']))
+		{
+			$db->setQuery("ALTER TABLE " . $table . " DROP metadata")->query();
+		}
 
 		$query = $db->getQuery(true)
 			->select('*')
 			->from($db->quoteName($table));
 		$db->setQuery($query);
 		$items = $db->loadObjectList();
+
+
 
 		foreach ($items as $item)
 		{
