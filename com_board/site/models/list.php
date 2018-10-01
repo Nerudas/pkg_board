@@ -600,6 +600,7 @@ class BoardModelList extends ListModel
 			$root->id        = 1;
 			$root->parent_id = 0;
 			$root->link      = Route::_(BoardHelperRoute::getListRoute(1));
+			$root->metadata  = new Registry();
 
 			if ($tag_id > 1)
 			{
@@ -609,10 +610,12 @@ class BoardModelList extends ListModel
 				{
 					$db    = $this->getDbo();
 					$query = $db->getQuery(true)
-						->select(array('t.id', 't.parent_id', 't.title', 'pt.title as parent_title'))
+						->select(array('t.id', 't.parent_id', 't.title', 'pt.title as parent_title',
+							'mt.metakey', 'mt.metadesc', 'mt.metadata'))
 						->from('#__tags AS t')
 						->where('t.id = ' . (int) $tag_id)
-						->join('LEFT', '#__tags AS pt ON pt.id = t.parent_id');
+						->join('LEFT', '#__tags AS pt ON pt.id = t.parent_id')
+						->join('LEFT', '#__board_tags AS mt ON mt.id = t.id');
 
 					$user = Factory::getUser();
 					if (!$user->authorise('core.admin'))
@@ -635,6 +638,13 @@ class BoardModelList extends ListModel
 					}
 
 					$data->link = Route::_(BoardHelperRoute::getListRoute($data->id));
+
+					$imagesHelper = new FieldTypesFilesHelper();
+					$imageFolder  = 'images/board/tags/' . $data->id;
+
+					// Convert the metadata field
+					$data->metadata = new Registry($data->metadata);
+					$data->metadata->set('image', $imagesHelper->getImage('meta', $imageFolder, false, false));
 
 					$this->_tag = $data;
 				}
