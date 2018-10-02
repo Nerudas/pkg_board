@@ -406,20 +406,6 @@ class BoardModelItem extends AdminModel
 				$item->published   = $item->state = 0;
 				$item->tags        = (!empty($item->tags) && !empty($item->tags->tags)) ? explode(',', $item->tags->tags) :
 					array();
-				$item->imagefolder = $this->imageFolderHelper->createTemporaryFolder();
-				if (!empty($item->images))
-				{
-					$registry     = new Registry($item->images);
-					$item->images = $registry->toArray();
-					foreach ($item->images as &$image)
-					{
-						$old          = JPATH_ROOT . '/' . $image['src'];
-						$image['src'] = $item->imagefolder . '/' . $image['file'];
-						$new          = JPATH_ROOT . '/' . $image['src'];
-						JFile::copy($old, $new);
-					}
-				}
-
 				$this->save(ArrayHelper::fromObject($item));
 			}
 		}
