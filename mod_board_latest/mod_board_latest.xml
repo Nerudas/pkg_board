@@ -19,6 +19,7 @@
 		<filename module="mod_board_latest">mod_board_latest.php</filename>
 		<folder>tmpl</folder>
 	</files>
+	<customContent />
 	<config>
 		<fields name="params" addfieldpath="/administrator/components/com_board/models/fields">
 			<fieldset name="basic">
