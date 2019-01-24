@@ -1,7 +1,7 @@
 <?php
 /**
  * @package    Bulletin Board - Tags Module
- * @version    1.3.0
+ * @version    1.3.1
  * @author     Nerudas  - nerudas.ru
  * @copyright  Copyright (c) 2013 - 2018 Nerudas. All rights reserved.
  * @license    GNU/GPL license: http://www.gnu.org/copyleft/gpl.html
